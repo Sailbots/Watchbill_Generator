@@ -1,0 +1,3845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Watchbill</title>
+<style>
+
+:root, :root[data-theme="slate"]{
+  --deck:#1b2126; --panel:#232b31; --panel-2:#2b343b;
+  --rule:#3a444c; --rule-soft:#2f383f;
+  --ink:#e9ecee; --muted:#95a0a8;
+  --brass:#d3a03c; --port:#d1495b; --stbd:#4a9d75; --warn:#c98b2e;
+  --accent-hi:#e0ad48;      
+  --on-accent:#1b2126;      
+  --on-accent-2:#3a2c10;
+  --edge:#4b5760;           
+  --night:#171d22;         
+  --night-2:#1a2126;
+  --blank:#181e22;          
+  --weekend:#171d22;
+  --today:#17342a;
+  --today-active:#22412f;
+  --holiday:#4a7fd1;
+  --console-bg:#12171b;
+  --conflict-bg:rgba(209,73,91,.16);
+  --conflict-ink:#f19aa5;
+  --nopool-bg:rgba(201,139,46,.10);
+  --breach-bg:rgba(209,73,91,.10);
+  --active-tint:rgba(211,160,60,.14);
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+.decor{display:none}
+:root[data-view="print"] .decor{display:none!important}
+
+:root[data-theme="halloween"]{
+  --deck:#141019; --panel:#1e1726; --panel-2:#2a2034;
+  --rule:#453754; --rule-soft:#332943;
+  --ink:#f4ebe0; --muted:#a48cba;
+  --brass:#ff8b25; --port:#e0435c; --stbd:#7bd66a; --warn:#ffc44d;
+  --accent-hi:#ffa04d;
+  --on-accent:#1a1020;
+  --on-accent-2:#4a2a08;
+  --edge:#6d5786;
+  --night:#181222;
+  --night-2:#1c1527;
+  --blank:#171122;
+  --weekend:#191325;
+  --today:#2b1c36;
+  --today-active:#3c2647;
+  --holiday:#8a5cf6;
+  --console-bg:#120e18;
+  --conflict-bg:rgba(224,67,92,.18);
+  --conflict-ink:#ff9db0;
+  --nopool-bg:rgba(255,196,77,.12);
+  --breach-bg:rgba(224,67,92,.12);
+  --active-tint:rgba(255,139,37,.16);
+}
+/* Copyright (c) 2026 James Coleman. MIT License */
+:root[data-theme="halloween"] .decor{display:block;position:fixed;inset:0;z-index:1;
+  pointer-events:none}
+:root[data-theme="halloween"] .decor .d1,
+:root[data-theme="halloween"] .decor .d2{position:absolute;top:0;width:150px;height:150px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 150 150'%3E%3Cg fill='none' stroke='%23ffb066' stroke-width='1.1'%3E%3Cpath d='M0 0 L150 0 M0 0 L139 58 M0 0 L106 106 M0 0 L58 139 M0 0 L0 150'/%3E%3Cpath d='M34 0 A34 34 0 0 1 0 34'/%3E%3Cpath d='M68 0 A68 68 0 0 1 0 68'/%3E%3Cpath d='M104 0 A104 104 0 0 1 0 104'/%3E%3Cpath d='M142 0 A142 142 0 0 1 0 142'/%3E%3C/g%3E%3C/svg%3E") no-repeat;opacity:.22}
+:root[data-theme="halloween"] .decor .d1{left:0}
+:root[data-theme="halloween"] .decor .d2{right:0;transform:scaleX(-1)}
+:root[data-theme="halloween"] .decor .d3{position:absolute;top:26px;left:50%;
+  transform:translateX(-50%);width:220px;height:16px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='16' viewBox='0 0 30 16'%3E%3Cpath fill='%23b98cf0' d='M15 3.4c1.1 0 1.8.9 2.1 1.9C18.4 3.4 20.7 1.7 23.5 1.7c-.8 1.4-.7 2.8-.2 3.8 1-.6 2.5-.7 3.9-.2-1.6.7-2.8 2.1-3.5 3.7-.9 2.2-3 3.7-5.3 3.7-1.6 0-2.8-.8-3.4-1.8-.6 1-1.8 1.8-3.4 1.8-2.3 0-4.4-1.5-5.3-3.7C5.6 7.4 4.4 6 2.8 5.3c1.4-.5 2.9-.4 3.9.2.5-1 .6-2.4-.2-3.8C9.3 1.7 11.6 3.4 12.9 5.3 13.2 4.3 13.9 3.4 15 3.4z'/%3E%3C/svg%3E") repeat-x;background-size:74px 16px;opacity:.5;
+  animation:flit 7s ease-in-out infinite}
+@keyframes flit{0%,100%{transform:translateX(-50%) translateY(0)}
+  50%{transform:translateX(-46%) translateY(7px)}}
+:root[data-theme="halloween"] .eyebrow::before{content:"";display:inline-block;width:16px;height:16px;
+  margin-right:7px;vertical-align:-3px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 22 22'%3E%3Cpath fill='%23ff8b25' d='M11 5c-3.3 0-6 2.9-6 7s2.7 7 6 7 6-2.9 6-7-2.7-7-6-7z'/%3E%3Cpath fill='%234a7a3a' d='M10.3 2.2h1.4v3.2h-1.4z'/%3E%3Cpath fill='%23241a2e' d='M8.3 9.6l1.5 2.2H6.8zm5.4 0l1.5 2.2h-3zM7.2 14.4h7.6c-.6 1.6-2 2.6-3.8 2.6s-3.2-1-3.8-2.6z'/%3E%3C/svg%3E") no-repeat center/contain}
+:root[data-theme="halloween"] .toptab[aria-selected="true"]{box-shadow:0 0 14px rgba(255,139,37,.28)}
+:root[data-theme="halloween"] .calday.today{box-shadow:inset 0 0 0 1px var(--stbd)}
+:root[data-theme="halloween"] .btn-primary{box-shadow:0 0 10px rgba(255,139,37,.35)}
+:root[data-theme="halloween"] .mast{border-bottom-color:var(--brass)}
+@media (prefers-reduced-motion:reduce){
+  :root[data-theme="halloween"] .decor .d3{animation:none}
+}
+
+:root[data-theme="submarines"]{
+  --deck:#fff2f8; --panel:#ffffff; --panel-2:#ffe1ef;
+  --rule:#f3b4d3; --rule-soft:#fbd8e8;
+  --ink:#4a1533; --muted:#9c5f81;
+  --brass:#e5399b; --port:#c62741; --stbd:#0f8a6a; --warn:#a96a0c;
+  --accent-hi:#c92a84;
+  --on-accent:#ffffff;
+  --on-accent-2:#ffe1ef;
+  --edge:#e07cb0;
+  --night:#fbe0f0;
+  --night-2:#f7d3e7;
+  --blank:#fce9f3;
+  --weekend:#fde7f3;
+  --today:#d5f4e7;
+  --today-active:#c4ecdb;
+  --holiday:#8b5cf6;
+  --console-bg:#ffffff;
+  --conflict-bg:rgba(198,39,65,.12);
+  --conflict-ink:#8f1a2e;
+  --nopool-bg:rgba(169,106,12,.14);
+  --breach-bg:rgba(198,39,65,.08);
+  --active-tint:rgba(229,57,155,.14);
+}
+:root[data-theme="submarines"] .decor{display:block;position:fixed;inset:0;z-index:1;pointer-events:none}
+:root[data-theme="submarines"] .decor .d1{position:absolute;top:0;left:0;right:0;height:26px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='26' viewBox='0 0 120 26'%3E%3Cpath d='M18 21c-6-4.5-10-8-10-12a5 5 0 0 1 10-2 5 5 0 0 1 10 2c0 4-4 7.5-10 12z' fill='%23f472b6'/%3E%3Cpath d='M58 6l1.9 5.1L65 13l-5.1 1.9L58 20l-1.9-5.1L51 13l5.1-1.9z' fill='%23fbbf24'/%3E%3Cpath d='M92 20c-4.6-3.5-7.6-6.2-7.6-9.2a3.8 3.8 0 0 1 7.6-1.5 3.8 3.8 0 0 1 7.6 1.5c0 3-3 5.7-7.6 9.2z' fill='%23c084fc'/%3E%3Cpath d='M112 8l1.3 3.4 3.4 1.3-3.4 1.3-1.3 3.4-1.3-3.4-3.4-1.3 3.4-1.3z' fill='%23f9a8d4'/%3E%3Cpath d='M36 9l1.3 3.4 3.4 1.3-3.4 1.3L36 18.4l-1.3-3.4L31.3 13.7l3.4-1.3z' fill='%2367e8f9'/%3E%3C/svg%3E") repeat-x;background-size:120px 26px;opacity:.55;
+  animation:twinkle 3.4s ease-in-out infinite}
+:root[data-theme="submarines"] .decor .d4{position:absolute;bottom:10px;right:20px;width:84px;height:128px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='84' height='128' viewBox='0 0 84 128'%3E%3Cpath d='M26 26Q22 6 42 6Q62 6 58 26Q58 44 52 50L32 50Q26 44 26 26Z' fill='%23c2410c'/%3E%3Ccircle cx='42' cy='27' r='13' fill='%23fcd9c2'/%3E%3Cpath d='M42 39Q54 47 51 66L33 66Q30 47 42 39Z' fill='%23f9a8d4'/%3E%3Cpath d='M33 66Q29 92 42 104Q55 92 51 66Z' fill='%235eead4'/%3E%3Cpath d='M42 104Q22 112 18 126Q42 118 42 108Q42 118 66 126Q62 112 42 104Z' fill='%232dd4bf'/%3E%3C/svg%3E") no-repeat;opacity:.4;animation:bob 5s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.55}50%{opacity:.3}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+:root[data-theme="submarines"] .toptab[aria-selected="true"]{box-shadow:0 2px 12px rgba(229,57,155,.22)}
+:root[data-theme="submarines"] .mast{border-bottom-color:var(--brass)}
+:root[data-theme="submarines"] .eyebrow::before{content:"";display:inline-block;width:14px;height:14px;
+  margin-right:7px;vertical-align:-2px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 18C3.4 13 0 9.6 0 5.8A5.4 5.4 0 0 1 10 3a5.4 5.4 0 0 1 10 2.8c0 3.8-3.4 7.2-10 12.2z' fill='%23e5399b'/%3E%3C/svg%3E") no-repeat center/contain}
+@media (prefers-reduced-motion:reduce){
+  :root[data-theme="submarines"] .decor span{animation:none}
+}
+
+:root[data-theme="chart"]{
+  --deck:#f2f6fb; --panel:#ffffff; --panel-2:#e4ecf6;
+  --rule:#b6c6da; --rule-soft:#d8e2ee;
+  --ink:#12243c; --muted:#5d6e85;
+  --brass:#1d4f8f; --port:#b3261e; --stbd:#1c7a4d; --warn:#9a6400;
+  --accent-hi:#163d70;
+  --on-accent:#ffffff;
+  --on-accent-2:#dbe6f4;
+  --edge:#8ea6c2;
+  --night:#e6ecf4;
+  --night-2:#dde6f1;
+  --blank:#e9eef5;
+  --weekend:#e8eff7;
+  --today:#d5ebdd;
+  --today-active:#c7e2d3;
+  --holiday:#2f6fbf;
+  --console-bg:#ffffff;
+  --conflict-bg:rgba(179,38,30,.12);
+  --conflict-ink:#8c1d18;
+  --nopool-bg:rgba(154,100,0,.13);
+  --breach-bg:rgba(179,38,30,.08);
+  --active-tint:rgba(29,79,143,.12);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--deck);color:var(--ink)}
+body{font-family:var(--sans);-webkit-font-smoothing:antialiased;padding:22px}
+input,select,button{font:inherit;color:inherit}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--brass);outline-offset:1px}
+h1,h2,h3,p,ul{margin:0}
+
+.navbar{display:flex;align-items:center;gap:5px;margin-bottom:10px}
+.navbar button{background:var(--panel);border:1px solid var(--rule);border-radius:2px;color:var(--muted);
+  cursor:pointer;font-size:15px;line-height:1;padding:4px 10px;min-width:34px}
+.navbar button:hover:not(:disabled){border-color:var(--brass);color:var(--brass)}
+.navbar button:disabled{opacity:.35;cursor:not-allowed}
+.mast{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;
+  border-bottom:2px solid var(--rule);padding-bottom:12px}
+.eyebrow{text-transform:uppercase;letter-spacing:.24em;font-size:10px;font-weight:700;color:var(--brass);margin-bottom:4px}
+#command{font-weight:700;font-size:27px;letter-spacing:.02em;text-transform:uppercase;margin:0}
+.dayline{margin-top:5px;font-size:12px;color:var(--muted)}
+.dayline b{font-family:var(--mono);color:var(--ink);font-weight:500}
+.dot{margin:0 7px;color:var(--rule)}
+.field{display:flex;flex-direction:column;gap:3px}
+.field span{text-transform:uppercase;letter-spacing:.14em;font-size:10px;font-weight:600;color:var(--muted)}
+.field input,.field select{background:var(--panel);border:1px solid var(--rule);border-radius:2px;
+  padding:6px 8px;font-family:var(--mono);font-size:13px;transition:border-color .12s,color .12s}
+.field input:hover,.field select:hover{border-color:var(--brass);color:var(--brass);cursor:pointer}
+
+.tabs-top{display:flex;gap:4px;margin-top:16px}
+.toptab{background:transparent;border:1px solid transparent;border-bottom:none;border-radius:3px 3px 0 0;
+  padding:10px 20px;cursor:pointer;font-weight:700;text-transform:uppercase;letter-spacing:.14em;
+  font-size:13px;color:var(--muted)}
+.toptab:hover{color:var(--ink)}
+.toptab[aria-selected="true"]{background:var(--panel);border-color:var(--rule);color:var(--brass)}
+.toptab.gear{margin-left:auto;padding:6px 16px;font-size:24px;letter-spacing:0;line-height:1.1;color:var(--ink)}
+.toptab.gear:hover{color:var(--brass)}
+.tabs-sub{display:flex;gap:2px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);
+  background:var(--panel);padding:0 6px;flex-wrap:wrap}
+.subtab{background:transparent;border:none;border-bottom:2px solid transparent;padding:9px 14px;
+  cursor:pointer;font-weight:600;text-transform:uppercase;letter-spacing:.1em;font-size:11px;color:var(--muted)}
+.subtab:hover{color:var(--ink)}
+.subtab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--brass)}
+.subtab .count{font-family:var(--mono);font-size:10px;color:var(--muted);margin-left:6px}
+.view{padding-top:18px}
+.view[hidden],.tabs-sub[hidden]{display:none}
+
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
+.spacer{flex:1}
+.btn{background:var(--panel);border:1px solid var(--rule);border-radius:2px;padding:7px 12px;cursor:pointer;
+  font-weight:600;text-transform:uppercase;letter-spacing:.09em;font-size:11px;transition:background .15s,border-color .15s}
+.btn:hover{background:var(--panel-2);border-color:var(--edge)}
+.btn-primary{background:var(--brass);border-color:var(--brass);color:var(--on-accent)}
+.btn-primary:hover{background:var(--accent-hi);border-color:var(--accent-hi)}
+.btn-quiet{background:transparent;color:var(--muted)}
+.btn-select{background:var(--panel);border:1px solid var(--rule);border-radius:2px;padding:7px 12px;
+  cursor:pointer;font-weight:600;text-transform:uppercase;letter-spacing:.09em;font-size:11px;
+  color:var(--ink);height:32px}
+.btn-select:hover{border-color:var(--brass);color:var(--brass)}
+.check{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.check input{accent-color:var(--brass)}
+#status{margin-bottom:10px;font-size:13px;color:var(--stbd);min-height:18px}
+.viewhead{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;justify-content:space-between;margin-bottom:12px}
+.viewhead h2{text-transform:uppercase;letter-spacing:.16em;font-size:14px;font-weight:700}
+.dutyflag{font-size:12px;color:var(--muted)}
+.dutyflag b{color:var(--brass)}
+
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:3px}
+table{border-collapse:collapse;width:100%}
+.bill{min-width:780px;table-layout:fixed}
+.bill th,.bill td{border:1px solid var(--rule-soft)}
+.th-station{background:var(--panel-2);text-align:left;padding:9px 12px;width:132px;
+  text-transform:uppercase;letter-spacing:.14em;font-size:10px;font-weight:600;color:var(--muted);
+  position:sticky;left:0;z-index:2}
+.th-len{background:var(--panel-2);text-align:left;padding:9px 10px;width:116px;
+  text-transform:uppercase;letter-spacing:.14em;font-size:10px;font-weight:600;color:var(--muted);
+  position:sticky;left:132px;z-index:2}
+.td-len{background:var(--panel);padding:6px 14px 6px 10px;position:sticky;left:132px;z-index:1}
+.td-len .lensel{width:88px;margin:0;background:transparent;border-color:var(--rule);color:var(--muted)}
+.td-len .lensel:hover{border-color:var(--edge);color:var(--ink)}
+.th-period{background:var(--panel-2);padding:8px 6px;text-align:left;font-family:var(--mono);
+  font-weight:500;font-size:12px;color:var(--muted)}
+.th-period.night{background:var(--night-2)}
+.td-station{background:var(--panel);text-align:left;padding:7px 12px;font-weight:500;font-size:14px;
+  position:sticky;left:0;z-index:1;line-height:1.3;white-space:nowrap}
+.lensel{background:var(--deck);border:1px solid var(--rule);border-radius:2px;padding:2px 4px;
+  font-family:var(--mono);font-size:11px;color:var(--muted);cursor:pointer;width:82px}
+.lensel:hover{border-color:var(--edge);color:var(--ink)}
+.lensel.over{border-color:var(--brass);color:var(--brass)}
+.cell{background:var(--deck);padding:5px 7px 6px;vertical-align:top}
+.cell.night{background:var(--night)}
+.cell-time{display:block;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.03em;margin-bottom:2px}
+.cell select{width:100%;background:transparent;border:1px solid transparent;border-radius:2px;
+  padding:2px;font-family:var(--mono);font-size:13px;cursor:pointer}
+.cell select:hover{border-color:var(--rule)}
+.cell select option,.cell select optgroup{background:var(--panel);color:var(--ink)}
+.cell.conflict{background:var(--conflict-bg)}
+.cell.conflict select{color:var(--conflict-ink)}
+.allday{min-width:420px}
+.allday th,.allday td{border:1px solid var(--rule-soft)}
+.allday thead th{background:var(--panel-2);padding:8px 10px;text-align:left;
+  text-transform:uppercase;letter-spacing:.14em;font-size:10px;font-weight:600;color:var(--muted)}
+.allday td{background:var(--deck);padding:5px 7px;vertical-align:top}
+.allday td.conflict{background:var(--conflict-bg)}
+.allday td.conflict select{color:var(--conflict-ink)}
+.allday td.nopool{background:var(--nopool-bg)}
+.allday select{width:100%;background:transparent;border:1px solid transparent;border-radius:2px;
+  padding:2px;font-family:var(--mono);font-size:13px;cursor:pointer}
+.allday select:hover{border-color:var(--rule)}
+.allday select option,.allday select optgroup{background:var(--panel);color:var(--ink)}
+.allday tr.lenrow td{padding:3px 7px 5px}
+.allday tr.lenrow select{width:82px;font-size:11px;color:var(--muted);border:1px solid var(--rule)}
+.allday tr.lenrow select.over{border-color:var(--brass);color:var(--brass)}
+.cell.nopool{background:var(--nopool-bg)}
+.cell.nopool select{color:var(--warn)}
+
+.readout{display:flex;flex-wrap:wrap;gap:14px;margin-top:18px}
+.rblock{background:var(--panel);border:1px solid var(--rule);border-radius:3px;padding:13px 15px;min-width:210px}
+.rwide{flex:1}
+.readout h3{text-transform:uppercase;letter-spacing:.16em;font-size:10px;font-weight:600;color:var(--muted);margin-bottom:8px}
+.stat{font-size:13px;color:var(--muted);margin-bottom:4px}
+.stat strong{font-family:var(--mono);font-size:17px;color:var(--ink);margin-right:5px}
+.stat.bad strong{color:var(--port)}
+.stat.warn strong{color:var(--warn)}
+.empty{font-size:13px;color:var(--muted)}
+.counts{list-style:none;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.counts li{display:flex;gap:8px;align-items:baseline;background:var(--deck);border:1px solid var(--rule-soft);
+  border-radius:2px;padding:4px 9px;font-size:13px}
+.counts b{font-family:var(--mono);color:var(--brass);font-weight:500}
+.counts i{font-style:normal;font-family:var(--mono);font-size:10px;color:var(--muted)}
+.foot{margin-top:16px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);border:1px solid var(--rule);
+  border-radius:3px;overflow:hidden;background:var(--rule-soft);gap:1px}
+.caldow{background:var(--panel-2);padding:7px 8px;text-transform:uppercase;letter-spacing:.14em;
+  font-size:10px;font-weight:600;color:var(--muted);text-align:center}
+.calday{background:var(--deck);height:104px;padding:6px 7px;display:flex;flex-direction:column;
+  gap:4px;overflow:hidden}
+.calday.blank{background:var(--blank)}
+.calday.past{opacity:.55}
+.calday.weekend{background:var(--weekend)}
+.calday.today{background:var(--today)}
+.calday.active{background:var(--active-tint)}
+.calday.today.active{background:var(--today-active)}
+.calday.hol{box-shadow:inset 0 0 0 2px var(--holiday)}
+.calday:not(.blank):hover{box-shadow:inset 0 0 0 2px var(--brass)}
+.caldate{display:flex;align-items:center;justify-content:space-between;gap:4px}
+.caldate .dnum{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.calday.today .dnum{color:var(--stbd)}
+.calday.active .dnum{color:var(--brass);font-weight:600}
+.dayacts{display:flex;gap:3px}
+.dayacts button{background:transparent;border:1px solid var(--rule);border-radius:2px;color:var(--muted);
+  cursor:pointer;padding:2px 4px;line-height:0;display:flex;align-items:center}
+.dayacts button:hover{border-color:var(--brass);color:var(--brass)}
+.daytags{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+select option,select optgroup{background:var(--panel);color:var(--ink)}
+.calsel{width:100%;background:var(--panel);border:1px solid var(--rule);border-radius:2px;
+  padding:4px 5px;font-size:12px;cursor:pointer;color:var(--muted)}
+.calsel.set{color:var(--ink);border-color:var(--edge)}
+.calsel:hover{border-color:var(--edge)}
+.calcount{font-family:var(--mono);font-size:10px;color:var(--muted)}
+.calassigned{font-family:var(--mono);font-size:10px;color:var(--muted)}
+.calassigned.short{color:var(--port)}
+.calday.short .caldate button{color:var(--port)}
+.sbbill{min-width:440px}
+.sbbill th,.sbbill td{border:1px solid var(--rule-soft);padding:6px 10px;text-align:left}
+.sbbill thead th{background:var(--panel-2);text-transform:uppercase;letter-spacing:.14em;
+  font-size:10px;font-weight:600;color:var(--muted)}
+.sbbill td.who{background:var(--panel);font-size:14px;width:300px}
+.sbbill td.pick{background:var(--deck)}
+.sbbill select{width:100%;background:transparent;border:1px solid transparent;border-radius:2px;
+  padding:3px;font-family:var(--mono);font-size:13px;cursor:pointer}
+.sbbill select:hover{border-color:var(--rule)}
+.sbbill select option{background:var(--panel);color:var(--ink)}
+.sbbill tr.gap td.pick{background:var(--conflict-bg)}
+.sbbill tr.gap select{color:var(--conflict-ink)}
+
+.sheet{background:#fff;color:#111;border-radius:3px;padding:26px 28px;
+  font-family:var(--sans);box-shadow:0 8px 30px rgba(0,0,0,.35)}
+.sheet h1{font-size:17px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin:0}
+.sheet .sub{font-size:12px;color:#444;margin-top:3px}
+.sheet .hdr{border-bottom:2px solid #111;padding-bottom:8px;margin-bottom:14px;
+  display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.sheet table{border-collapse:collapse;width:100%}
+.sheet th,.sheet td{border:1px solid #999;padding:5px 7px;font-size:12px;text-align:left}
+.sheet thead th{background:#e8e8e8;font-size:10px;text-transform:uppercase;letter-spacing:.1em}
+.sheet td.st{font-weight:600;white-space:nowrap;background:#f4f4f4}
+.adsheet td{text-align:center;font-weight:600}
+.sheet table.narrowtable{width:auto;min-width:340px}
+.sheet .narrowtable td.st{width:120px}
+.sheet .narrowtable td{min-width:190px}
+.adsheet thead th{text-align:center}
+.sheet td.blank{color:#b00}
+.sheet h2{font-size:11px;text-transform:uppercase;letter-spacing:.14em;margin:18px 0 6px;color:#333}
+.sigblock{display:flex;flex-wrap:wrap;gap:34px;margin-top:52px;page-break-inside:avoid}
+.sig{flex:1;min-width:210px}
+.sig .lbl{display:block;font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.12em;color:#111;margin-bottom:40px}
+.sig .line{display:block;border-bottom:1px solid #111;height:0}
+.sig .line.short{width:130px;margin-top:34px}
+.sig .cap{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.12em;
+  color:#555;margin-top:5px}
+
+.calsheetwrap{overflow-x:auto}
+.msheet{border-collapse:collapse;table-layout:fixed}
+.msheet th,.msheet td{border:1px solid #aaa;font-size:9px;padding:0;text-align:center;
+  width:19px;height:19px;overflow:hidden}
+.msheet th.nm,.msheet td.nm{text-align:left;white-space:nowrap;width:150px;font-size:11px;
+  padding:0 6px;position:sticky;left:0;background:#fff}
+.msheet thead th{background:#ececec;height:20px}
+.msheet thead th.we{background:#cfe0f5}
+.msheet tr.dept td{background:#333;color:#fff;text-align:left;font-size:10px;padding:0 6px;
+  text-transform:uppercase;letter-spacing:.14em;font-weight:700}
+.msheet td.we{background:#eaf2fb}
+.msheet td.duty{background:#dfe6ee;font-weight:700;color:#12243c}
+.msheet td.leave{background:linear-gradient(to top right,
+  transparent calc(50% - 0.7px), #555 calc(50% - 0.7px), #555 calc(50% + 0.7px), transparent calc(50% + 0.7px))}
+.msheet tr.secrow td{background:#f4f4f4;font-weight:700;font-size:9px}
+.modal{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.55);
+  display:flex;align-items:center;justify-content:center;padding:24px}
+.modal[hidden]{display:none}
+.modalbox{background:var(--panel);border:1px solid var(--rule);border-radius:4px;
+  width:100%;max-width:880px;max-height:86vh;display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.modalhead{display:flex;justify-content:space-between;align-items:center;gap:14px;
+  padding:11px 14px;background:var(--panel-2);border-bottom:1px solid var(--rule);
+  text-transform:uppercase;letter-spacing:.14em;font-size:11px;font-weight:700;color:var(--brass)}
+.modalbody{overflow:auto;padding:16px}
+.pv h4{margin:0 0 6px;text-transform:uppercase;letter-spacing:.14em;font-size:10px;
+  font-weight:700;color:var(--muted)}
+.pv table{border-collapse:collapse;width:100%;margin-bottom:16px}
+.pv th,.pv td{border:1px solid var(--rule-soft);padding:5px 8px;font-size:12px;text-align:left}
+.pv thead th{background:var(--panel-2);text-transform:uppercase;letter-spacing:.1em;
+  font-size:10px;color:var(--muted);font-family:var(--mono)}
+.pv td.st{background:var(--deck);font-weight:600;white-space:nowrap;width:110px}
+.pv td.gap{color:var(--port)}
+.pv .none{font-size:13px;color:var(--muted)}
+.console{position:fixed;right:22px;bottom:22px;width:340px;z-index:60;background:var(--console-bg);
+  border:1px solid var(--rule);border-radius:4px;box-shadow:0 14px 40px rgba(0,0,0,.35);
+  overflow:hidden;opacity:1;transition:opacity 2s linear}
+.console.fading{opacity:0}
+.console:hover{opacity:1;transition:opacity .15s linear}
+.console[hidden]{display:none}
+.console header{display:flex;justify-content:space-between;align-items:center;gap:8px;
+  background:var(--panel-2);padding:8px 10px;border-bottom:1px solid var(--rule);
+  text-transform:uppercase;letter-spacing:.14em;font-size:10px;font-weight:700;color:var(--brass)}
+.console header button{background:transparent;border:none;color:var(--muted);cursor:pointer;
+  font-size:12px;line-height:1;padding:2px 4px}
+.console header button:hover{color:var(--ink)}
+#conBody{max-height:230px;overflow-y:auto;padding:8px 10px;font-family:var(--mono);
+  font-size:11px;line-height:1.65;color:var(--muted)}
+#conBody div{white-space:pre-wrap;animation:conIn .18s ease-out}
+#conBody div.hi{color:var(--ink)}
+#conBody div.good{color:var(--stbd)}
+#conBody div.warn{color:var(--warn)}
+#conBody div.bad{color:var(--port)}
+@keyframes conIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){#conBody div{animation:none}}
+.breach{background:var(--breach-bg);border:1px solid var(--port);border-left:3px solid var(--port);
+  border-radius:3px;padding:13px 15px;margin-top:16px}
+.breach h3{text-transform:uppercase;letter-spacing:.16em;font-size:11px;font-weight:700;
+  color:var(--port);margin-bottom:8px}
+.breach .lede{font-size:12px;color:var(--ink);margin-bottom:10px;line-height:1.5}
+.breach ul{list-style:none;padding:0;margin:0}
+.breach li{font-size:12px;color:var(--muted);padding:3px 0;border-bottom:1px solid var(--rule-soft)}
+.breach li:last-child{border-bottom:none}
+.breach li b{color:var(--port);font-weight:600}
+.breach li .who{color:var(--ink)}
+.sbrow{display:flex;justify-content:space-between;align-items:center;gap:10px;
+  padding:3px 0;border-bottom:1px solid var(--rule-soft)}
+.sbrow:last-child{border-bottom:none}
+.sbrow span{font-size:12px;color:var(--muted)}
+.sbrow select{width:160px;background:var(--deck);border:1px solid var(--rule);border-radius:2px;
+  padding:3px 5px;font-family:var(--mono);font-size:12px;cursor:pointer}
+.sbrow.gap select{border-color:var(--port);color:var(--conflict-ink)}
+.deptblock{margin-bottom:10px}
+.deptblock:last-child{margin-bottom:0}
+.deptblock h4{margin:0 0 4px;text-transform:uppercase;letter-spacing:.14em;font-size:10px;
+  font-weight:700;color:var(--brass)}
+.deptnames{display:flex;flex-wrap:wrap;gap:5px}
+.deptnames span{background:var(--deck);border:1px solid var(--rule-soft);border-radius:2px;
+  padding:3px 8px;font-size:12px}
+.deptnames span.idle{color:var(--muted);opacity:.6}
+.deptnames span b{font-family:var(--mono);color:var(--brass);font-weight:500;margin-left:6px}
+.deptnames span.borrowed{border-color:var(--warn)}
+.calhol{background:var(--brass);color:var(--on-accent);border-radius:2px;font-size:8px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;padding:2px 5px}
+.caldst{color:var(--warn);font-family:var(--mono);font-size:9px;font-weight:600;margin-left:4px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:11px;color:var(--muted)}
+.legend span b{color:var(--ink);font-weight:500}
+.entrygrid{display:flex;flex-wrap:wrap;gap:16px;margin-top:34px}
+.entrygrid .card{flex:1;min-width:340px;margin-bottom:0}
+.entrygrid .ta{flex:none;width:154px}
+.entrygrid .field{flex:none}
+.entrygrid .field input,.entrygrid .ta input{width:154px;min-width:154px}
+#ndListing,#holListing{max-height:246px;overflow-y:auto}
+#ndListing thead th,#holListing thead th{position:sticky;top:0;background:var(--panel);z-index:1}
+.splitgrid{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start}
+.splitgrid .wide{flex:2 1 520px;min-width:0}
+.splitgrid .narrow{flex:1 1 260px;min-width:0}
+.splitgrid .card{margin-bottom:0}
+.splitgrid .narrow .addrow input{width:100%}
+.splitgrid .narrow .addrow{flex-direction:column;align-items:stretch;gap:8px}
+.structrow{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--rule-soft);flex-wrap:wrap}
+.structrow:last-child{border-bottom:none}
+.structrow .nm{flex:1;font-size:13px}
+.structrow .meta{font-family:var(--mono);font-size:10px;color:var(--muted);flex-basis:100%;order:3}
+.structrow .nm{flex:1;min-width:0;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.structrow .btn{padding:4px 9px;font-size:10px}
+.themerow{display:flex;flex-wrap:wrap;gap:10px}
+.themecard{background:var(--deck);border:1px solid var(--rule);border-radius:3px;padding:10px 12px;
+  cursor:pointer;text-align:left;min-width:150px}
+.themecard:hover{border-color:var(--edge)}
+.themecard[aria-pressed="true"]{border-color:var(--brass);box-shadow:inset 0 0 0 1px var(--brass)}
+.themecard .nm{display:block;font-size:13px;font-weight:600;margin-bottom:2px}
+.themecard .ds{display:block;font-size:11px;color:var(--muted);margin-bottom:8px}
+.swatches{display:flex;gap:4px}
+.swatches i{width:16px;height:16px;border-radius:2px;border:1px solid rgba(128,128,128,.4);display:block}
+
+.ta{position:relative;flex:1;min-width:200px}
+.ta input{width:100%}
+.ta-list{position:absolute;z-index:20;top:100%;left:0;right:0;margin-top:2px;list-style:none;padding:4px;
+  background:var(--panel-2);border:1px solid var(--rule);border-radius:2px;max-height:220px;overflow-y:auto;
+  box-shadow:0 8px 20px rgba(0,0,0,.4)}
+.ta-list[hidden]{display:none}
+.ta-list li{padding:6px 8px;cursor:pointer;font-size:13px;border-radius:2px;display:flex;
+  justify-content:space-between;gap:10px}
+.ta-list li small{color:var(--muted);font-family:var(--mono);font-size:11px}
+.ta-list li:hover,.ta-list li.on{background:var(--brass);color:var(--on-accent)}
+.ta-list li:hover small,.ta-list li.on small{color:var(--on-accent-2)}
+.ta-list li.none{cursor:default;color:var(--muted)}
+.ta-list li.none:hover{background:transparent;color:var(--muted)}
+.ndtable{width:100%;border-collapse:collapse;margin-top:6px}
+.ndtable th{text-align:left;text-transform:uppercase;letter-spacing:.14em;font-size:10px;font-weight:600;
+  color:var(--muted);padding:5px 8px;border-bottom:1px solid var(--rule-soft)}
+.ndtable td{padding:5px 8px;font-size:13px;border-bottom:1px solid var(--rule-soft)}
+.ndtable td.range{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap}
+.ndtable td.reason{color:var(--muted)}
+.ndtable td.act{text-align:right;width:40px}
+.ndtable tr.past{opacity:.5}
+.logtable{width:100%;border-collapse:collapse;margin-top:4px}
+.logtable th{text-align:left;text-transform:uppercase;letter-spacing:.14em;font-size:10px;
+  font-weight:600;color:var(--muted);padding:6px 8px;border-bottom:1px solid var(--rule)}
+.logtable td{padding:5px 8px;font-size:12px;border-bottom:1px solid var(--rule-soft);vertical-align:top}
+.logtable td.when{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:nowrap}
+.logtable td.act{white-space:nowrap;font-weight:600}
+.logtable td.act.add{color:var(--stbd)}
+.logtable td.act.del{color:var(--port)}
+.logtable td.act.chg{color:var(--brass)}
+.logtable td.detail{color:var(--muted)}
+.logwrap{max-height:340px;overflow-y:auto}
+
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:3px;padding:16px;margin-bottom:18px}
+.card input,.card select{background:var(--deck);border:1px solid var(--rule);border-radius:2px;padding:6px 8px;font-size:13px}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}
+.section-head h2{text-transform:uppercase;letter-spacing:.14em;font-size:13px;font-weight:700;color:var(--brass)}
+.dayrow{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end}
+.hint{flex:1;min-width:230px;font-size:12px;color:var(--muted);line-height:1.5}
+.tiny{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.55}
+.tut details{border-top:1px solid var(--rule-soft);padding:2px 0}
+.tut details:first-of-type{border-top:none}
+.tut summary{cursor:pointer;padding:10px 0;font-size:13px;font-weight:700;list-style:none}
+.tut summary::-webkit-details-marker{display:none}
+.tut summary::before{content:"\25B8";display:inline-block;width:16px;color:var(--brass)}
+.tut details[open] summary::before{content:"\25BE"}
+.tut .tbody{padding:0 0 12px 16px;font-size:13px;line-height:1.6}
+.tut .tbody p{margin:0 0 8px}
+.tut .tbody ul{margin:0 0 8px 18px}
+.tut .tbody li{margin-bottom:4px}
+.tut .where{font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+
+.listhead,.rowline,.addrow{display:flex;gap:6px;align-items:center}
+.listhead{margin-bottom:6px}
+.listhead span{text-transform:uppercase;letter-spacing:.14em;font-size:10px;font-weight:600;color:var(--muted)}
+.list{list-style:none;padding:0;display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.c-num{width:22px;flex:none;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.c-name{flex:1;min-width:160px}
+.c-dept{width:260px;flex:none;display:flex;flex-wrap:wrap;gap:4px}
+.c-len{width:118px;flex:none}
+.c-len select{width:100%;font-family:var(--mono)}
+.c-acts{width:96px;flex:none;display:flex;gap:6px}
+.chip{background:transparent;border:1px solid var(--rule);border-radius:2px;padding:3px 7px;cursor:pointer;
+  font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.chip:hover{border-color:var(--edge);color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--brass);border-color:var(--brass);color:var(--on-accent)}
+.icon{background:transparent;border:1px solid var(--rule);border-radius:2px;width:28px;height:30px;cursor:pointer;
+  color:var(--muted);line-height:1;flex:none}
+.icon:hover:not(:disabled){background:var(--panel-2);color:var(--ink)}
+.icon:disabled{opacity:.3;cursor:not-allowed}
+.icon-danger:hover{border-color:var(--port);color:var(--port)}
+.rowdel{background:transparent;border:none;color:transparent;cursor:pointer;font-size:12px;
+  line-height:1;padding:2px 4px}
+.rowdel.always{color:var(--muted)}
+tr:hover .rowdel,li:hover .rowdel{color:var(--muted)}
+.rowdel:hover{color:var(--port)!important}
+.rowdel:focus-visible{color:var(--muted)}
+.addrow{flex-wrap:wrap;border-top:1px solid var(--rule-soft);padding-top:12px}
+.pillline{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:10px}
+.pill{display:flex;align-items:center;gap:6px;background:var(--deck);border:1px solid var(--rule);
+  border-radius:2px;padding:4px 6px 4px 10px;font-size:13px}
+.pill button{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:14px;line-height:1;padding:0 2px}
+.pill button:hover{color:var(--port)}
+.pill .n{font-family:var(--mono);font-size:10px;color:var(--muted)}
+
+.cov{display:flex;flex-wrap:wrap;gap:12px}
+.covcard{flex:1;min-width:260px;background:var(--deck);border:1px solid var(--rule);border-radius:3px;padding:12px 14px}
+.covcard.ok{border-left:3px solid var(--stbd)}
+.covcard.short{border-left:3px solid var(--port)}
+.covcard h4{margin:0 0 6px;text-transform:uppercase;letter-spacing:.14em;font-size:11px;font-weight:700}
+.covstate{font-size:12px;margin-bottom:8px}
+.covstate.ok{color:var(--stbd)}
+.covstate.short{color:var(--port)}
+.covlist{list-style:none;padding:0;margin:0;font-size:12px}
+.covlist li{display:flex;justify-content:space-between;gap:10px;padding:3px 0;border-bottom:1px solid var(--rule-soft)}
+.covlist li:last-child{border-bottom:none}
+.covlist li span{color:var(--muted)}
+.covlist li b{font-weight:500}
+.covlist li.gap b{color:var(--port)}
+.covwhy{font-size:11px;color:var(--warn);margin-top:8px;line-height:1.5}
+.seccard{flex:1;min-width:250px;background:var(--deck);border:1px solid var(--rule);border-radius:3px;padding:12px 14px}
+.seccard.short{border-left:3px solid var(--port)}
+.seccard.ok{border-left:3px solid var(--stbd)}
+.seccard header{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:2px}
+.seccard h4{margin:0;text-transform:uppercase;letter-spacing:.14em;font-size:11px;font-weight:700}
+.seccard .n{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.namelist{list-style:none;padding:0;margin:8px 0 0;display:flex;flex-direction:column;
+  max-height:280px;overflow-y:auto}
+.namelist li{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;
+  padding:4px 0;border-bottom:1px solid var(--rule-soft)}
+.namelist li:last-child{border-bottom:none}
+.namelist li button{background:transparent;border:none;color:var(--muted);cursor:pointer;
+  font-size:13px;line-height:1;padding:0 3px}
+.namelist li button:hover{color:var(--port)}
+.namelist li.none{color:var(--muted);border-bottom:none}
+
+.matrixwrap{overflow:auto;border:1px solid var(--rule);border-radius:3px;max-height:70vh}
+.matrix{border-collapse:separate;border-spacing:0}
+.matrix th,.matrix td{border-right:1px solid var(--rule-soft);border-bottom:1px solid var(--rule-soft)}
+.matrix thead th{background:var(--panel-2);vertical-align:bottom;padding:8px 6px;font-weight:600;
+  position:sticky;top:0;z-index:4}
+.q-head{white-space:nowrap;width:32px;vertical-align:bottom;padding:6px 4px}
+.q-head span{writing-mode:vertical-rl;transform:rotate(180deg);text-transform:uppercase;
+  letter-spacing:.06em;font-size:10px;font-weight:600;color:var(--muted)}
+.m-acts{width:34px;white-space:nowrap}
+.m-len select{width:96px;font-family:var(--mono);font-size:12px;background:var(--deck);
+  border:1px solid var(--rule);border-radius:2px;padding:4px 5px}
+.st-name{width:100%;background:transparent;border:1px solid transparent;border-radius:2px;
+  padding:4px 5px;font-size:14px}
+.st-name:hover{border-color:var(--rule)}
+.m-sailor{position:sticky;left:0;z-index:5;background:var(--panel-2);text-align:left;min-width:200px;
+  text-transform:uppercase;letter-spacing:.14em;font-size:10px;color:var(--muted)}
+.matrix tbody .m-sailor{background:var(--panel);z-index:3;padding:5px 8px;text-transform:none;letter-spacing:0}
+.matrix tbody td{background:var(--deck);padding:5px 6px;text-align:center}
+.m-name{width:100%;background:transparent;border:1px solid transparent;border-radius:2px;padding:4px 5px;font-size:14px}
+.m-name:hover{border-color:var(--rule)}
+.m-plain{font-size:14px;padding:4px 5px;display:block}
+.m-dept select{width:146px;font-size:12px;background:var(--deck);border:1px solid var(--rule);border-radius:2px;padding:4px 5px}
+.m-sec select{width:74px;font-family:var(--mono);font-size:12px;background:var(--deck);
+  border:1px solid var(--rule);border-radius:2px;padding:4px 5px;text-align:center}
+.matrix input[type=checkbox]{width:16px;height:16px;accent-color:var(--brass);cursor:pointer}
+.m-col{padding:5px 6px;text-align:center}
+.qsum{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.offdept{opacity:.4}
+.filterbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.filterbar input{background:var(--panel);border:1px solid var(--rule);border-radius:2px;padding:6px 9px;
+  font-size:13px;width:220px}
+.filterbar select{background:var(--panel);border:1px solid var(--rule);border-radius:2px;padding:6px 8px;font-size:13px}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{
+  @page{margin:12mm}
+  .decor{display:none!important}
+  .sheet{box-shadow:none;padding:0}
+  .sheet .hdr{border-bottom:2px solid #000}
+  body{background:#fff;color:#000;padding:0}
+  .noprint,.tabs-top,.tabs-sub,.toolbar,.readout,#status{display:none!important}
+  .bill th,.bill td,.th-station,.td-station,.cell,.cell.night,.cell.nopool,.th-period,.th-period.night
+    {background:#fff!important;color:#000!important;border-color:#000!important}
+  .cell select,.cell-time,.lensel{color:#000!important;border-color:#666!important}
+  .calgrid{background:#000}
+  .calday,.calday.weekend,.calday.blank,.caldow{background:#fff!important;color:#000!important}
+  .caldate button,.calsel,.calcount,.caloff{color:#000!important}
+  .tablewrap{border-color:#000}
+}
+</style>
+</head>
+<body>
+
+<div class="decor" aria-hidden="true"><span class="d1"></span><span class="d2"></span>
+  <span class="d3"></span><span class="d4"></span></div>
+
+<nav class="navbar noprint">
+  <button id="navBack" title="Back" aria-label="Back">&#8249;</button>
+  <button id="navFwd" title="Forward" aria-label="Forward">&#8250;</button>
+  <button id="navUndo" title="Undo the last change" aria-label="Undo">&#8630;</button>
+
+</nav>
+
+<header class="mast">
+  <div>
+    <p class="eyebrow">Duty Watchbill</p>
+    <h1 id="command">USS EXAMPLE</h1>
+    <p class="dayline" id="dayline"></p>
+  </div>
+  <label class="field"><span>Date</span><input type="date" id="date" /></label>
+</header>
+
+<nav class="tabs-top" role="tablist">
+  <button class="toptab" role="tab" data-top="daily" aria-selected="true">Daily Watchbills</button>
+  <button class="toptab" role="tab" data-top="cal" aria-selected="false">Duty Calendar</button>
+  <button class="toptab" role="tab" data-top="management" aria-selected="false">Management</button>
+  <button class="toptab gear" role="tab" data-top="settings" aria-selected="false"
+          title="App settings" aria-label="App settings">&#9881;</button>
+</nav>
+
+<nav class="tabs-sub" id="sub-daily">
+  <button class="subtab" data-tab="bill" aria-selected="true">Watchbill Editor</button>
+  <button class="subtab" data-tab="billprint" aria-selected="false">Watchbill Printoff</button>
+</nav>
+<nav class="tabs-sub" id="sub-cal" hidden>
+  <button class="subtab" data-tab="calendar" aria-selected="true">Calendar Editor</button>
+  <button class="subtab" data-tab="calprint" aria-selected="false">Calendar Printoff</button>
+</nav>
+<nav class="tabs-sub" id="sub-settings" hidden>
+  <button class="subtab" data-tab="settings" aria-selected="true">App Settings</button>
+  <button class="subtab" data-tab="audits" aria-selected="false">Audits</button>
+  <button class="subtab" data-tab="help" aria-selected="false">Help &amp; Contact</button>
+</nav>
+<nav class="tabs-sub" id="sub-management" hidden>
+  <button class="subtab" data-tab="sailors" aria-selected="true">Sailors</button>
+  <button class="subtab" data-tab="stations" aria-selected="false">Watchstations</button>
+  <button class="subtab" data-tab="sections" aria-selected="false">Duty Sections</button>
+  <button class="subtab" data-tab="standbys" aria-selected="false">Qualified Standbys</button>
+</nav>
+
+<p id="status" class="noprint"></p>
+
+<div id="dayModal" class="modal noprint" hidden>
+  <div class="modalbox" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modalhead">
+      <span id="modalTitle">Watchbill</span>
+      <span style="display:flex;gap:8px">
+        <button class="btn" id="modalEdit">Open in editor</button>
+        <button class="btn btn-quiet" id="modalClose">Close</button>
+      </span>
+    </div>
+    <div class="modalbody" id="modalBody"></div>
+  </div>
+</div>
+
+<div id="console" class="console noprint" hidden>
+  <header><span id="conTitle">Working</span>
+    <button id="conClose" aria-label="Close">&#10005;</button></header>
+  <div id="conBody"></div>
+</div>
+
+<!-- ========================== DAILY WATCHBILL ========================== -->
+<section class="view" id="view-bill" role="tabpanel">
+  <div class="viewhead">
+    <h2>Daily Watchbill</h2>
+  </div>
+  <div class="toolbar noprint">
+    <button class="btn btn-primary" id="btn-fillsection">Fill from duty section</button>
+    <button class="btn" id="btn-resetLen">Reset lengths</button>
+    <button class="btn" id="btn-save">Save setup</button>
+    <button class="btn" id="btn-exportDay">Export day</button>
+    <button class="btn btn-quiet" id="btn-clear">Clear assignments</button>
+  </div>
+  <div class="tablewrap" id="alldayWrap"><table class="allday" id="alldayTable"></table></div>
+  <div class="tablewrap" style="margin-top:14px"><table class="bill" id="billTable"></table></div>
+  <div class="readout" id="readout"></div>
+  <div id="billBreach"></div>
+</section>
+
+<!-- ========================= WATCHBILL PRINTOFF ======================== -->
+<section class="view" id="view-billprint" role="tabpanel" hidden>
+  <div class="toolbar noprint">
+    <button class="btn btn-primary" id="btn-printBill">Print</button>
+    <span class="tiny" style="margin:0">Prints what you see below.</span>
+  </div>
+  <div class="sheet" id="billSheet"></div>
+</section>
+
+<!-- ========================== CALENDAR PRINTOFF ======================== -->
+<section class="view" id="view-calprint" role="tabpanel" hidden>
+  <div class="toolbar noprint">
+    <button class="btn btn-primary" id="btn-printCal">Print</button>
+    <label class="check"><input type="checkbox" id="calPrintAll" checked /> Include sailors with no watches</label>
+    <span class="tiny" style="margin:0">Landscape</span>
+  </div>
+  <div class="sheet" id="calSheet"></div>
+</section>
+
+<!-- ============================ APP SETTINGS =========================== -->
+<section class="view" id="view-settings" role="tabpanel" hidden>
+  <div class="splitgrid">
+    <div class="wide">
+      <div class="card">
+        <div class="section-head"><h2>Command</h2></div>
+        <div class="dayrow">
+          <label class="field" style="flex:1;min-width:220px"><span>Title of the watchbill</span>
+            <input id="setCommand" style="width:100%" /></label>
+        </div>
+        <div class="section-head" style="margin-top:18px;padding-top:14px;border-top:1px solid var(--rule-soft)">
+          <h2>Theme</h2>
+        </div>
+        <div class="themerow" id="themeRow"></div>
+
+      </div>
+    </div>
+    <div class="narrow">
+      <div class="card">
+        <div class="section-head"><h2>Review signature lines</h2></div>
+        <p class="tiny" style="margin:0 0 10px">Printed blank at the bottom of every printoff.</p>
+        <ul class="list" id="sigList"></ul>
+        <div class="addrow">
+          <input id="newSig" placeholder="e.g. Engineering Duty Officer" maxlength="32" />
+          <button class="btn btn-primary" id="btn-addSig">Add line</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-head"><h2>Saved data</h2></div>
+    <div class="addrow" style="border-top:none;padding-top:0;align-items:center">
+      <label class="check"><input type="checkbox" id="autosave" /> Autosave</label>
+      <button class="btn" id="btn-linkFile" hidden>Link a file</button>
+      <button class="btn" id="btn-save2">Save now</button>
+      <button class="btn btn-quiet" id="btn-wipeBills">Clear all generated bills</button>
+    </div>
+    <p class="tiny" id="saveState"></p>
+    <p class="tiny">Watchbills more than 30 days old are cleared automatically. Export a month
+      before it ages out if you need to keep it.</p>
+    <p class="tiny">Browser storage lives in this browser on this machine only — it does not survive
+      clearing site data and does not travel with the HTML file. Link a file, or export one, for
+      anything you don't want to lose.</p>
+
+    <div class="section-head" style="margin-top:18px;padding-top:14px;border-top:1px solid var(--rule-soft)">
+      <h2>Export &amp; import</h2>
+    </div>
+    <div class="addrow" style="border-top:none;padding-top:0;align-items:flex-end">
+      <label class="field"><span>File name</span>
+        <input id="expName" maxlength="40" placeholder="watchbill" style="width:220px" /></label>
+      <button class="btn btn-primary" id="btn-exportAll">Export everything</button>
+      <button class="btn" id="btn-importPick">Import from file</button>
+      <input type="file" id="importFile" accept=".json,application/json" hidden />
+    </div>
+    <p class="tiny">Exports a watchbill state file.
+      Import accepts a full export or a single day's watchbill. Single days are exported from the
+      Watchbill Editor and are named after their date.</p>
+  </div>
+</section>
+
+<!-- ========================== HELP AND CONTACT ========================= -->
+<section class="view" id="view-help" role="tabpanel" hidden>
+  <div class="card tut">
+    <div class="section-head"><h2>Quick-start tutorial</h2></div>
+    <p class="tiny" style="margin:0 0 8px">The short version: tell the app who you have and what watches
+      exist, say which days belong to which duty section, then let it build the month. Work through the
+      steps in order the first time. Everything on the app comes pre-loaded with made-up example data,
+      so you can click around freely.</p>
+
+    <details open>
+      <summary>1. Add sailors</summary>
+      <div class="tbody">
+        <div class="where">Management &rarr; Sailors</div>
+        <ul>
+          <li>Type a name, pick a department, and press <b>Add sailor</b>. Names and departments can be edited right in the table.</li>
+          <li>Each column is a watchstation. <b>Check the box</b> for every watch that person is qualified to stand. The app will never assign someone to a watch they aren't checked for.</li>
+          <li>The &#10005; at the end of a row removes that person. Use the filter box to find someone in a long roster.</li>
+          <li>Delete the example sailors when you're ready to enter your own.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary>2. Set up your watches and hours</summary>
+      <div class="tbody">
+        <div class="where">Management &rarr; Watchstations</div>
+        <ul>
+          <li><b>Duty day</b>: set when a normal workday duty day starts and ends, and the hours used for weekends and holidays.</li>
+          <li><b>Departments</b>: add or remove the departments your people belong to.</li>
+          <li><b>Watchstations</b>: add the watches you stand and choose how long each one is (for example 4-hour rotating watches, or all-day watches that one person holds for the whole duty day). Choose which departments can stand each one.</li>
+          <li><b>Saved structures</b> lets you save the current set of watches under a name so you can switch layouts later.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary>3. Split people into duty sections</summary>
+      <div class="tbody">
+        <div class="where">Management &rarr; Duty Sections</div>
+        <ul>
+          <li>Add as many sections as your command uses (1, 2, 3&hellip;).</li>
+          <li>Under <b>Assign a sailor</b>, start typing a name, pick the section, and press <b>Assign</b>. Assigning someone who is already in a section moves them.</li>
+          <li>The section rosters below show who is in each section, so you can check that every section has enough people.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary>4. Standby qualifications (optional)</summary>
+      <div class="tbody">
+        <div class="where">Management &rarr; Qualified Standbys</div>
+        <p>Some commands need certain qualified people on the watchbill each duty day even when
+          those watches are not actively manned. Add each of those as a <b>standby watch</b>, then
+          check which sailors hold it. The coverage panel at the top shows whether each section has
+          someone for every standby. If your command doesn't use this, skip it.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>5. Build the month</summary>
+      <div class="tbody">
+        <div class="where">Duty Calendar &rarr; Calendar Editor</div>
+        <ul>
+          <li>Pick the month, year and a duty rotation.</li>
+          <li>Add anything that takes people out of being eligible certian days. Under <b>Off-Duty Entry</b>, enter a name, dates, and a short reason, like "Leave" or "TAD". Under <b>Holidays &amp; Off Days</b>, enter days for weekend hours.</li>
+          <li>Press <b>Set duty rotation</b>. This only decides which section has the duty each day</li>
+          <li>Press <b>Generate month</b>. The app fills every day's watchbill, following rules like no back-to-back watches, no back-to-back duty days, only qualified sailors, etc. and spreads hours as evenly as it can.</li>
+          <li>Any day it couldn't fill cleanly is flagged, with a plain explanation of why (for example, not enough qualified people that day).</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary>6. Review, adjust, and print</summary>
+      <div class="tbody">
+        <div class="where">Calendar &rarr; click a day &rarr; Open in editor</div>
+        <ul>
+          <li>Click any day on the calendar to preview it, then <b>Open in editor</b> to change it.</li>
+          <li>In the <b>Watchbill Editor</b>, every cell is a drop-down of the people who can stand that watch. Change anyone you want. The readout below the table warns you if a change breaks a rule.</li>
+          <li><b>Fill from duty section</b> rebuilds that single day; <b>Clear assignments</b> empties it; <b>Reset lengths</b> puts the watch times back to default.</li>
+          <li>The <b>undo arrow</b> (&#8630;) in the top bar steps back one change at a time.</li>
+          <li>For paper copies, open <b>Watchbill Printoff</b> (one day) or <b>Calendar Printoff</b> (whole month) and press <b>Print</b>. The signature lines at the bottom can be changed in App Settings.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary>7. Save your work</summary>
+      <div class="tbody">
+        <div class="where">Gear icon &rarr; App Settings</div>
+        <ul>
+          <li>Turn on <b>Autosave</b> to keep your work in this browser. It stays on this computer only; it is never uploaded anywhere.</li>
+          <li>Clearing your browser's site data erases it. To be safe, press <b>Export everything</b> now and then and keep the file. <b>Import from file</b> restores it, including on a different computer.</li>
+          <li>Watchbills older than 30 days are cleared automatically, so export a month before it ages out if you need to keep it.</li>
+        </ul>
+      </div>
+    </details>
+  </div>
+
+  <div class="card">
+    <div class="section-head"><h2>About/Contact me!</h2></div>
+    <p class="tiny" style="margin:0">I use AI/ML to try and solve problems for everyday sailors. Nothing here represents opinions of the Navy, the DoW, or my command. This is not a program of record, nor endorsed by the US Navy. For issues, feedbag, questions/comments, feel free to reach out to me at james.m.coleman165.mil@us.navy.mil
+
+"Standby Watchstations" were made with Nuclear OP B.5 requirements in mind, but are likely relevant to other commands. Ensures people who have certain quals will be on a watchbill, even if those watches are not stood up. The program will also throw errors for back to back watches, back to back duty days, not enough qualified personnel, and is written to maximize an equitable distribution of watchstanding hours among sailors. Delete the "example" sailors, watchstations, etc. to implement your own.
+</p>
+  </div>
+</section>
+
+<!-- =============================== AUDITS ============================== -->
+<section class="view" id="view-audits" role="tabpanel" hidden>
+  <div class="card">
+    <div class="section-head">
+      <h2>Retention</h2>
+      <span class="tiny" style="margin:0" id="auditCount"></span>
+    </div>
+    <div class="dayrow">
+      <label class="field"><span>Keep entries for</span>
+        <select id="auditDays">
+          <option value="30">30 days</option>
+          <option value="45">45 days</option>
+          <option value="60">60 days</option>
+          <option value="90">90 days</option>
+        </select></label>
+      <p class="hint">Anything older is dropped the next time the log is written. Export before
+        it ages out if you need to keep it.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-head">
+      <h2>Sailor audit</h2>
+      <button class="btn" id="btn-csvSailor">Export CSV</button>
+    </div>
+    <div id="auditSailor"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-head">
+      <h2>Calendar audit</h2>
+      <button class="btn" id="btn-csvCal">Export CSV</button>
+    </div>
+    <div id="auditCal"></div>
+  </div>
+</section>
+
+<!-- ============================ DUTY CALENDAR ========================== -->
+<section class="view" id="view-calendar" role="tabpanel" hidden>
+  <div class="viewhead">
+    <h2>Duty Calendar</h2>
+  </div>
+
+  <div class="toolbar noprint" style="align-items:flex-end">
+    <label class="field"><span>Month</span><select id="calMonth"></select></label>
+    <label class="field"><span>Year</span><select id="calYear"></select></label>
+    <div class="spacer"></div>
+    <select id="dutyModel" class="btn-select" aria-label="Duty model">
+        <option value="3">Three Section</option>
+        <option value="4">Four Section</option>
+        <option value="minimal">Maximize Days Off</option>
+    </select>
+    <button class="btn" id="btn-rotate" title="Writes which duty section owns each day. Assigns nobody.">Set duty rotation</button>
+    <button class="btn btn-primary" id="btn-genmonth" title="Builds every day's watchbill from its duty section.">Generate month</button>
+    <button class="btn" id="btn-today">Today</button>
+    <button class="btn btn-quiet" id="btn-clearMonth">Clear month</button>
+  </div>
+
+  <div class="calgrid" id="calGrid"></div>
+  <div id="calBreach"></div>
+
+  <div class="entrygrid">
+    <div class="card">
+      <div class="section-head">
+        <h2>Off-Duty Entry</h2>
+        <span class="tiny" style="margin:0" id="ndCount"></span>
+      </div>
+      <div class="addrow" style="border-top:none;padding-top:0;align-items:flex-end">
+        <div class="ta">
+          <label class="field"><span id="ndCrewLbl">Sailor</span>
+            <input id="ndName" placeholder="Name" autocomplete="off" role="combobox"
+                   aria-expanded="false" aria-controls="ndList" />
+          </label>
+          <ul class="ta-list" id="ndList" role="listbox" hidden></ul>
+        </div>
+        <label class="field"><span>Start</span><input type="date" id="ndStart" /></label>
+        <label class="field"><span>End</span><input type="date" id="ndEnd" /></label>
+        <label class="field"><span>Reason</span><input id="ndReason" maxlength="20" placeholder="Leave, TAD…" /></label>
+        <button class="btn btn-primary" id="btn-addND">Add</button>
+      </div>
+      <div id="ndListing"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-head">
+        <h2>Holidays &amp; Off Days</h2>
+        <span class="tiny" style="margin:0" id="holCount"></span>
+      </div>
+      <div class="addrow" style="border-top:none;padding-top:0;align-items:flex-end">
+        <label class="field"><span>Start</span><input type="date" id="holStart" /></label>
+        <label class="field"><span>End</span><input type="date" id="holEnd" /></label>
+        <label class="field"><span>Name</span><input id="holName" maxlength="20" placeholder="Holiday name" /></label>
+        <button class="btn btn-primary" id="btn-addHol">Add</button>
+      </div>
+      <div id="holListing"></div>
+      <p class="tiny">These days use the weekend duty-day hours. A duty day that ends on one
+        picks up the later end time.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== MANAGE SAILORS =========================== -->
+<section class="view" id="view-sailors" role="tabpanel" hidden>
+  <div class="card">
+    <div class="section-head">
+      <h2 id="addCrewHead">Add a sailor</h2>
+    </div>
+    <div class="addrow" style="border-top:none;padding-top:0">
+      <input id="newSaName" placeholder="Name" style="width:200px" />
+      <select id="newSaDept" style="width:170px"></select>
+      <button class="btn btn-primary" id="btn-addSailor">Add sailor</button>
+    </div>
+  </div>
+
+  <div class="filterbar">
+    <input id="saFilter" placeholder="Filter by name" aria-label="Filter sailors by name" />
+    <select id="saSort" aria-label="Sort sailors">
+      <option value="">Roster order</option>
+      <option value="az">Name A to Z</option>
+      <option value="za">Name Z to A</option>
+    </select>
+    <span class="tiny" style="margin:0" id="saShown"></span>
+  </div>
+  <div class="matrixwrap"><table class="matrix" id="matrix"></table></div>
+  <p class="tiny" id="rosterNote"></p>
+</section>
+
+<!-- ======================== MANAGE WATCHSTATIONS ======================= -->
+<section class="view" id="view-stations" role="tabpanel" hidden>
+  <div class="card">
+    <div class="section-head"><h2>Duty day</h2></div>
+    <div class="dayrow">
+      <label class="field"><span>Workday start</span><input type="time" id="workStart" value="07:00" /></label>
+      <label class="field"><span>Workday end</span><input type="time" id="workEnd" value="07:00" /></label>
+      <span style="width:18px"></span>
+      <label class="field"><span>Weekend / holiday start</span><input type="time" id="wkndStart" value="08:00" /></label>
+      <label class="field"><span>Weekend / holiday end</span><input type="time" id="wkndEnd" value="08:00" /></label>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-head"><h2>Departments</h2></div>
+    <div class="pillline" id="deptLine"></div>
+    <div class="addrow" style="border-top:none;padding-top:0">
+      <input id="newDept" placeholder="Enter a new department" style="flex:1;min-width:200px" />
+      <button class="btn btn-primary" id="btn-addDept">Add department</button>
+    </div>
+  </div>
+
+  <div class="splitgrid">
+    <div class="wide">
+  <div class="card">
+    <div class="section-head"><h2>Watchstations on this bill</h2></div>
+    <div class="matrixwrap" style="max-height:none"><table class="matrix" id="stationTable"></table></div>
+    <div class="addrow">
+      <input id="newStName" placeholder="New watchstation" maxlength="32" style="width:210px" />
+      <span class="m-len" style="display:inline-block;width:82px"><select id="newStLen" style="width:82px"></select></span>
+      <button class="btn btn-primary" id="btn-addStation">Add watchstation</button>
+    </div>
+  </div>
+    </div>
+    <div class="narrow">
+  <div class="card">
+    <div class="section-head">
+      <h2>Saved structures</h2>
+      <span class="tiny" style="margin:0">Up to 8 · watch layout only</span>
+    </div>
+    <div class="addrow" style="border-top:none;padding-top:0">
+      <input id="structName" placeholder="Name this layout" style="width:260px" maxlength="28" />
+      <button class="btn btn-primary" id="btn-saveStruct">Save current layout</button>
+    </div>
+    <div id="structList"></div>
+  </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================== DUTY SECTIONS =========================== -->
+<section class="view" id="view-sections" role="tabpanel" hidden>
+  <div class="card">
+    <div class="section-head"><h2>Duty sections</h2></div>
+    <div class="pillline" id="sectionLine"></div>
+    <div class="addrow" style="border-top:none;padding-top:0">
+      <input id="newSection" placeholder="New section, e.g. 4" style="width:180px" />
+      <button class="btn btn-primary" id="btn-addSection">Add section</button>
+    </div>
+    <p class="tiny">Removing a section clears it from the duty calendar and unassigns its sailors.</p>
+  </div>
+
+  <div class="card">
+    <div class="section-head"><h2>Assign a sailor</h2></div>
+    <div class="addrow" style="border-top:none;padding-top:0;align-items:flex-end">
+      <div class="ta">
+        <label class="field"><span id="asCrewLbl">Sailor</span>
+          <input id="asName" placeholder="Start typing a name" autocomplete="off" role="combobox"
+                 aria-expanded="false" aria-controls="asList" />
+        </label>
+        <ul class="ta-list" id="asList" role="listbox" hidden></ul>
+      </div>
+      <label class="field"><span>Section</span><select id="asSec" style="width:130px"></select></label>
+      <button class="btn btn-primary" id="btn-assignSec">Assign</button>
+    </div>
+    <p class="tiny">Assigning a sailor who is already in a section moves them.</p>
+  </div>
+
+  <p class="tiny" id="secDemand" style="margin:0 0 12px"></p>
+  <div class="cov" id="secRosters"></div>
+</section>
+
+<!-- ========================= QUALIFIED STANDBYS ======================== -->
+<section class="view" id="view-standbys" role="tabpanel" hidden>
+  <div class="viewhead">
+    <h2>Qualified Standbys</h2>
+  </div>
+
+  <div class="card">
+    <div class="section-head"><h2>Standby coverage by section</h2></div>
+    <div class="cov" id="covPanel"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-head"><h2>Standby watches</h2></div>
+    <ul class="list" id="standbyList"></ul>
+    <div class="addrow">
+      <input class="c-name" id="newSbName" placeholder="New standby watch, e.g. Reactor Operator" />
+      <button class="btn btn-primary" id="btn-addStandby">Add standby watch</button>
+    </div>
+  </div>
+
+  <div class="filterbar">
+    <input id="sbFilter" placeholder="Filter by name" aria-label="Filter sailors by name" />
+    <select id="sbSecFilter" aria-label="Filter by section"></select>
+    <label class="check"><input type="checkbox" id="sbOnlyQual" /> Only sailors with a standby qual</label>
+    <span class="tiny" style="margin:0" id="sbShown"></span>
+  </div>
+  <div class="matrixwrap"><table class="matrix" id="sbMatrix"></table></div>
+</section>
+
+<script>
+/* ================================================================== */
+/*  DEFAULTS                                                          */
+/* ================================================================== */
+
+const DEFAULT_DEPTS = ["Engineering","Weapons","Navigation/IT"];
+const DEFAULT_SECTIONS = ["1","2","3"];
+
+const DEFAULT_STATIONS = [
+  /* all-day watches print across the top, in this order */
+  { id:"st-05", name:"SDO",   len:"all", departments:["Engineering","Weapons","Navigation/IT"] },
+  { id:"st-04", name:"DCPO",  len:"all", departments:["Engineering","Weapons","Navigation/IT"] },
+  { id:"st-06", name:"EDO",   len:"all", departments:["Engineering"] },
+  { id:"st-07", name:"EDPO",  len:"all", departments:["Engineering"] },
+  /* rotating watches */
+  { id:"st-01", name:"ECP 1", len:4,     departments:["Weapons","Navigation/IT"] },
+  { id:"st-02", name:"TS",    len:4,     departments:["Weapons","Navigation/IT"] },
+  { id:"st-03", name:"BD",    len:4,     departments:["Weapons","Navigation/IT","Engineering"] },
+  { id:"st-08", name:"SRO",   len:4,     departments:["Engineering"] },
+  { id:"st-09", name:"SEO",   len:4,     departments:["Engineering"] },
+  { id:"st-10", name:"SRW",   len:4,     departments:["Engineering"] },
+];
+
+const DEFAULT_STANDBYS = [
+  { id:"sb-01", name:"EOOW" },
+  { id:"sb-02", name:"EWS"  },
+  { id:"sb-03", name:"ERS"  },
+  { id:"sb-04", name:"PPO"  },
+  { id:"sb-05", name:"EO"   },
+  { id:"sb-06", name:"ERUL" },
+  { id:"sb-07", name:"ERLL" },
+  { id:"sb-08", name:"ELT"  },
+  { id:"sb-09", name:"RE"   },
+];
+
+/* [name, department, role]
+   OFF officer · CPO chief · SEN senior engineering · ENG engineering watchstander · JR junior
+   Order matters: sections cycle within each role, so departments are interleaved deliberately. */
+const ROSTER = [
+  /* 70 test sailors. Order matters: sections cycle within each rank group, so the
+     departments are interleaved to keep every section covered for every watch. */
+  ["Alvarez","Engineering","OFF"],   ["Chen","Weapons","OFF"],
+  ["Kowalski","Navigation/IT","OFF"],["Hargrove","Engineering","OFF"],
+  ["Sandoval","Engineering","OFF"],  ["Ellsworth","Engineering","OFF"],
+  ["Bhatt","Engineering","OFF"],     ["Marchand","Weapons","OFF"],
+
+  ["Nunez","Engineering","CPO"],     ["Boyd","Weapons","CPO"],
+  ["Delacroix","Navigation/IT","CPO"],["Whitcomb","Engineering","CPO"],
+  ["Ferraro","Engineering","CPO"],   ["Halvorsen","Engineering","CPO"],
+  ["Osei","Engineering","CPO"],      ["Prieto","Weapons","CPO"],
+
+  ["Okafor","Engineering","SEN"],    ["Pratt","Engineering","SEN"],
+  ["Vance","Engineering","SEN"],     ["Lindqvist","Engineering","SEN"],
+  ["Moreau","Engineering","SEN"],    ["Tanaka","Engineering","SEN"],
+  ["Blackwell","Engineering","SEN"], ["Ibarra","Engineering","SEN"],
+  ["Sorensen","Engineering","SEN"],  ["Ashby","Engineering","SEN"],
+  ["Delgado","Engineering","SEN"],   ["Fontaine","Engineering","SEN"],
+  ["Grieve","Engineering","SEN"],
+
+  ["Whitfield","Engineering","ENG"], ["Garrett","Engineering","ENG"],
+  ["Nakamura","Engineering","ENG"],  ["Duval","Engineering","ENG"],
+  ["Marchetti","Engineering","ENG"], ["Ashford","Engineering","ENG"],
+  ["Renteria","Engineering","ENG"],  ["Kaplan","Engineering","ENG"],
+  ["Novak","Engineering","ENG"],     ["Brennan","Engineering","ENG"],
+  ["Villalobos","Engineering","ENG"],["Ekstrom","Engineering","ENG"],
+  ["Coleridge","Engineering","ENG"], ["Yamamoto","Engineering","ENG"],
+  ["Mancini","Engineering","ENG"],   ["Nystrom","Engineering","ENG"],
+  ["Oyelaran","Engineering","ENG"],  ["Petrov","Engineering","ENG"],
+  ["Quintero","Engineering","ENG"],  ["Rasmussen","Engineering","ENG"],
+
+  ["Diaz","Weapons","JR"],           ["Rowe","Navigation/IT","JR"],
+  ["Salcedo","Weapons","JR"],        ["Aguilar","Navigation/IT","JR"],
+  ["Turner","Weapons","JR"],         ["Mbeki","Navigation/IT","JR"],
+  ["Fitzgerald","Weapons","JR"],     ["Reyes","Navigation/IT","JR"],
+  ["Palumbo","Weapons","JR"],        ["Vogel","Navigation/IT","JR"],
+  ["Sinclair","Weapons","JR"],       ["Ziegler","Navigation/IT","JR"],
+  ["Whitaker","Weapons","JR"],       ["Bellweather","Navigation/IT","JR"],
+  ["Odom","Weapons","JR"],           ["Donnelly","Navigation/IT","JR"],
+  ["Castillo","Weapons","JR"],       ["Farrow","Navigation/IT","JR"],
+  ["Guzman","Weapons","JR"],         ["Hollister","Navigation/IT","JR"],
+  ["Ingram","Weapons","JR"],
+];
+
+function buildRoster(){
+  const seen={}, out=[];
+  ROSTER.forEach((r,i)=>{
+    const name=r[0], dept=r[1], role=r[2];
+    if (seen[role]===undefined) seen[role]=0;
+    const n=seen[role]++;
+    let quals=[], sb=[];
+    if (role==="OFF"){
+      quals = dept==="Engineering" ? ["st-05","st-06"] : ["st-05"];
+      if (dept==="Engineering") sb=["sb-01"];
+    } else if (role==="CPO"){
+      quals = dept==="Engineering" ? ["st-04","st-07"] : ["st-04"];
+      if (dept==="Engineering") sb=["sb-02","sb-03"];
+    } else if (role==="SEN"){
+      quals = ["st-07","st-10", n%2 ? "st-09" : "st-08"];
+      sb = ["sb-01","sb-02","sb-03","sb-04","sb-05","sb-09"];
+    } else if (role==="ENG"){
+      quals = ["st-10","st-03", n%2 ? "st-09" : "st-08"];
+      sb = [["sb-04","sb-06","sb-09"],["sb-05","sb-07","sb-08"],
+            ["sb-03","sb-04","sb-07","sb-09"],["sb-08","sb-06","sb-05"]][n%4];
+    } else {
+      quals = ["st-01","st-02","st-03"];
+    }
+    out.push({ id:"sa-"+String(i+1).padStart(2,"0"), name:name, department:dept,
+      section: DEFAULT_SECTIONS[n % DEFAULT_SECTIONS.length], quals:quals, sbQuals:sb });
+  });
+  return out;
+}
+
+const MONTHS = ["January","February","March","April","May","June",
+                "July","August","September","October","November","December"];
+const DOW = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const STORE = "watchbill.setup.v8";
+
+const now = new Date();
+const state = {
+  command:"USS EXAMPLE (SSN 000)",
+  date: todayISO(),
+  workStart:"07:00", workEnd:"07:00",
+  wkndStart:"08:00", wkndEnd:"08:00",
+  holidays:{},
+  departments: DEFAULT_DEPTS.slice(),
+  sections: DEFAULT_SECTIONS.slice(),
+  stations: clone(DEFAULT_STATIONS),
+  standbys: clone(DEFAULT_STANDBYS),
+  sailors: buildRoster(),
+  duty:{}, noDuty:[], structures:[],
+  signatures:["Watchbill Coordinator","Duty Chief","Duty Officer"],
+  audit:[], auditDays:60, theme:"slate", exportName:"", autosave:true,
+  dutyModel:"3",   // "3" | "4" | "5" sections in rotation, or "minimal" for the smallest crew
+  bills:{},          // "YYYY-MM-DD" -> { assign:{stationId::offset -> sailorId}, standby:{sbId -> sailorId}, lengths:{} }
+  saFilter:"", saSort:"", sbFilter:"", sbSec:"", sbOnlyQual:false, calPrintAll:true,
+  calMonth: now.getMonth(), calYear: now.getFullYear(),
+  top:"watchbills", tab:"bill",
+};
+
+/* ================================================================== */
+/*  HELPERS                                                           */
+/* ================================================================== */
+
+function clone(x){ return JSON.parse(JSON.stringify(x)); }
+function iso(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function todayISO(){ return iso(new Date()); }
+function toMin(t){ const p=String(t).split(":"); return (+p[0]||0)*60+(+p[1]||0); }
+function clock(m){ const x=((m%1440)+1440)%1440;
+  return String(Math.floor(x/60)).padStart(2,"0")+String(x%60).padStart(2,"0"); }
+function clockEnd(m){ return (m>0 && m%1440===0) ? "2400" : clock(m); }
+function gcd(a,b){ return b ? gcd(b,a%b) : a; }
+function isNight(m){ const x=((m%1440)+1440)%1440; return x>=1200 || x<360; }
+function key(st,off){ return st+"::"+off; }
+function esc(s){ return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function uid(p){ return p+"-"+Math.random().toString(36).slice(2,8); }
+function hrs(m){ return (m/60).toFixed(m%60?1:0); }
+const ICON_EDIT="<svg viewBox='0 0 16 16' width='11' height='11' aria-hidden='true'>"+
+  "<path d='M11.3 1.7l3 3L5 14l-4 1 1-4z' fill='none' stroke='currentColor' stroke-width='1.5' "+
+  "stroke-linejoin='round'/></svg>";
+const ICON_VIEW="<svg viewBox='0 0 16 16' width='11' height='11' aria-hidden='true'>"+
+  "<path d='M1 8s2.6-4.6 7-4.6S15 8 15 8s-2.6 4.6-7 4.6S1 8 1 8z' fill='none' stroke='currentColor' "+
+  "stroke-width='1.5'/><circle cx='8' cy='8' r='1.9' fill='currentColor'/></svg>";
+const ICON_SKULL="<svg viewBox='0 0 16 16' width='11' height='11' aria-hidden='true'><ellipse cx='8' cy='6.6' rx='5.4' ry='4.9' fill='currentColor'/><rect x='5.2' y='10.1' width='5.6' height='3.3' rx='.9' fill='currentColor'/><circle cx='6' cy='6.6' r='1.6' fill='var(--deck)'/><circle cx='10' cy='6.6' r='1.6' fill='var(--deck)'/><path d='M8 8.6 L6.9 10.4 L9.1 10.4 Z' fill='var(--deck)'/></svg>";
+const ICON_BONE="<svg viewBox='0 0 18 12' width='12' height='11' aria-hidden='true'><rect x='3.4' y='4.8' width='11.2' height='2.4' rx='1.2' fill='currentColor'/><circle cx='3.6' cy='4.2' r='2.1' fill='currentColor'/><circle cx='3.6' cy='7.8' r='2.1' fill='currentColor'/><circle cx='14.4' cy='4.2' r='2.1' fill='currentColor'/><circle cx='14.4' cy='7.8' r='2.1' fill='currentColor'/></svg>";
+/** The Halloween theme swaps the calendar's day controls for a bone and a skull. */
+function iconEdit(){ return state.theme==="halloween" ? ICON_BONE : ICON_EDIT; }
+function iconView(){ return state.theme==="halloween" ? ICON_SKULL : ICON_VIEW; }
+/** ...and renames the crew. */
+function crewWord(cap,plural){
+  let w = state.theme==="halloween" ? "zombie" : "sailor";
+  if (plural) w+="s";
+  return cap ? w.charAt(0).toUpperCase()+w.slice(1) : w;
+}
+function ordinal(n){
+  const t=n%100;
+  if (t>=11 && t<=13) return n+"th";
+  return n+({1:"st",2:"nd",3:"rd"}[n%10]||"th");
+}
+function sailorById(id){ return state.sailors.find(s=>s.id===id); }
+/** "Engineering Watch Supervisor" -> EWS; an all-caps word is kept whole ("Duty ELT" -> DELT). */
+function dutySection(dateStr){ return state.duty[dateStr]||""; }
+
+/* Every day owns its own watch assignments, standby manning and length overrides. */
+function dayBill(ds){
+  ds = ds || state.date;
+  if (!state.bills[ds]) state.bills[ds]={ assign:{}, standby:{}, lengths:{} };
+  const b=state.bills[ds];
+  if (!b.assign) b.assign={};
+  if (!b.standby) b.standby={};
+  if (!b.lengths) b.lengths={};
+  return b;
+}
+function A(ds){ return dayBill(ds).assign; }
+function touch(ds){ dayBill(ds).updated=Date.now(); }
+
+/* ---------- autosave ---------- */
+let saveTimer=null, fileHandle=null, lastWrite=0;
+
+function saveLocal(){
+  pruneBills();
+  try{
+    localStorage.setItem(STORE,JSON.stringify(fullPayload().data));
+    return true;
+  }catch(err){ return false; }
+}
+/** Write to the linked file too, when the browser supports it and one is linked. */
+async function saveFile(){
+  if (!fileHandle) return false;
+  try{
+    const w=await fileHandle.createWritable();
+    await w.write(JSON.stringify(fullPayload(),null,2));
+    await w.close();
+    return true;
+  }catch(err){
+    fileHandle=null;
+    flash("Lost the link to that file — relink it in Settings");
+    renderSaveState();
+    return false;
+  }
+}
+/** force=true for the manual Save button, which works even with autosave off. */
+async function persist(force){
+  if (!state.autosave && !force) return false;   // a queued write must not outlive the setting
+  const ok=saveLocal();
+  const f=await saveFile();
+  lastWrite=Date.now();
+  renderSaveState();
+  return ok||f;
+}
+/** Called after anything that could have changed the data; writes shortly after you stop. */
+function markDirty(){
+  clearTimeout(saveTimer);
+  if (!state.autosave) return;
+  saveTimer=setTimeout(()=>persist(),1200);
+}
+function renderSaveState(){
+  const el=document.getElementById("saveState");
+  if (!el) return;
+  el.innerHTML = !state.autosave
+    ? "Autosave is <b>off</b>. Use Save on this computer, or export a file."
+    : (fileHandle
+        ? "Autosave is <b>on</b> — writing to this browser and to your linked file."
+        : "Autosave is <b>on</b> — writing to this browser."+
+          (window.showSaveFilePicker ? " Link a file to keep a real copy in step." : ""))+
+      (lastWrite? " Last write "+fmtStamp(lastWrite)+"." : "");
+  const btn=document.getElementById("btn-linkFile");
+  if (btn) btn.hidden=!window.showSaveFilePicker;
+}
+
+/* ---------- export and import ---------- */
+function exportBase(){
+  const raw=(state.exportName||"").trim().replace(/[^\w\-. ]+/g,"_").trim();
+  return raw || "watchbill";
+}
+function downloadJSON(filename,obj){
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(obj,null,2)],{type:"application/json"}));
+  a.download=filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+/** Everything worth keeping, in one object. */
+function fullPayload(){
+  return {
+    kind:"watchbill-setup", version:1, exported:Date.now(), command:state.command,
+    data:{
+      command:state.command, workStart:state.workStart, workEnd:state.workEnd,
+      wkndStart:state.wkndStart, wkndEnd:state.wkndEnd, holidays:state.holidays,
+      departments:state.departments, sections:state.sections, stations:state.stations,
+      standbys:state.standbys, sailors:state.sailors, duty:state.duty, noDuty:state.noDuty,
+      bills:state.bills, structures:state.structures, signatures:state.signatures,
+      audit:state.audit, auditDays:state.auditDays, theme:state.theme,
+      dutyModel:state.dutyModel, exportName:state.exportName
+    }
+  };
+}
+/** One day, with enough context to tell whether it still fits this roster. */
+function dayPayload(ds){
+  const b=dayBill(ds);
+  const names={};
+  Object.keys(b.assign).forEach(k=>{ const w=sailorById(b.assign[k]); if(w) names[b.assign[k]]=w.name; });
+  Object.keys(b.standby).forEach(k=>{ const w=sailorById(b.standby[k]); if(w) names[b.standby[k]]=w.name; });
+  return {
+    kind:"watchbill-day", version:1, exported:Date.now(), command:state.command,
+    date:ds, section:dutySection(ds),
+    bill:clone(b),
+    stations:state.stations.map(x=>({id:x.id,name:x.name,len:x.len})),
+    standbys:state.standbys.map(x=>({id:x.id,name:x.name})),
+    sailorNames:names
+  };
+}
+function applyImport(obj){
+  if (!obj || typeof obj!=="object") throw new Error("not a watchbill file");
+
+  if (obj.kind==="watchbill-setup" && obj.data){
+    pushUndo("import setup");
+    const s=obj.data;
+    Object.keys(s).forEach(k=>{ if (s[k]!==undefined) state[k]=s[k]; });
+    if (!state.sailors) state.sailors=[];
+    applyTheme();
+    document.getElementById("command").textContent=state.command;
+    ["workStart","workEnd","wkndStart","wkndEnd"].forEach(id=>{
+      const el=document.getElementById(id); if (el) el.value=state[id];
+    });
+    pruneAssignments(); pruneAudit();
+    showTab(state.tab);
+    return "Imported the full setup";
+  }
+
+  if (obj.kind==="watchbill-day" && obj.bill && obj.date){
+    pushUndo("import day");
+    const b={ assign:{}, standby:{}, lengths:obj.bill.lengths||{}, updated:Date.now() };
+    let dropped=0;
+    Object.keys(obj.bill.assign||{}).forEach(k=>{
+      const stId=k.split("::")[0];
+      const who=sailorById(obj.bill.assign[k]);
+      if (who && state.stations.some(x=>x.id===stId)) b.assign[k]=who.id; else dropped++;
+    });
+    Object.keys(obj.bill.standby||{}).forEach(sb=>{
+      const who=sailorById(obj.bill.standby[sb]);
+      if (who && state.standbys.some(x=>x.id===sb)) b.standby[sb]=who.id; else dropped++;
+    });
+    state.bills[obj.date]=b;
+    state.date=obj.date;
+    document.getElementById("date").value=obj.date;
+    showTop("daily"); showTab("bill");
+    return "Imported "+obj.date+(dropped?" — "+dropped+" entries did not match this roster":"");
+  }
+
+  throw new Error("unrecognised file");
+}
+
+/* ---------- undo ---------- */
+const UNDO_KEYS=["departments","sections","stations","standbys","sailors","duty","noDuty",
+                 "holidays","bills","structures","signatures","dutyModel","command"];
+const undoStack=[];
+function snapshot(){
+  const out={};
+  UNDO_KEYS.forEach(k=>{ out[k]=clone(state[k]); });
+  return out;
+}
+/** Call immediately before anything that changes the data, with a short label. */
+function pushUndo(label){
+  undoStack.push({ label:label, data:snapshot() });
+  if (undoStack.length>20) undoStack.shift();
+  refreshNav();
+}
+function undo(){
+  const step=undoStack.pop();
+  if (!step) return;
+  UNDO_KEYS.forEach(k=>{ state[k]=step.data[k]; });
+  document.getElementById("command").textContent=state.command;
+  applyTheme();
+  refreshNav();
+  showTab(state.tab);
+  flash("Undid: "+step.label);
+}
+
+/* ---------- back / forward through the views ---------- */
+const navBack=[], navFwd=[];
+let navCurrent=null, navSuspend=false;
+function here(){ return { top:state.top, tab:state.tab, date:state.date,
+                          calMonth:state.calMonth, calYear:state.calYear }; }
+function sameSpot(a,b){
+  return a&&b&&a.top===b.top&&a.tab===b.tab&&a.date===b.date&&
+         a.calMonth===b.calMonth&&a.calYear===b.calYear;
+}
+function noteVisit(){
+  if (navSuspend) return;
+  const spot=here();
+  if (sameSpot(spot,navCurrent)) return;
+  if (navCurrent) navBack.push(navCurrent);
+  navCurrent=spot;
+  navFwd.length=0;
+  refreshNav();
+}
+function goTo(spot){
+  navSuspend=true;
+  state.date=spot.date; state.calMonth=spot.calMonth; state.calYear=spot.calYear;
+  document.getElementById("date").value=state.date;
+  document.getElementById("calMonth").value=String(state.calMonth);
+  document.getElementById("calYear").value=String(state.calYear);
+  showTop(spot.top);
+  showTab(spot.tab);
+  navCurrent=spot;
+  navSuspend=false;
+  refreshNav();
+}
+function refreshNav(){
+  document.getElementById("navBack").disabled=!navBack.length;
+  document.getElementById("navFwd").disabled=!navFwd.length;
+  const u=document.getElementById("navUndo");
+  u.disabled=!undoStack.length;
+  u.title = undoStack.length ? "Undo: "+undoStack[undoStack.length-1].label : "Undo the last change";
+}
+
+/* ---------- audit trail ---------- */
+function pruneAudit(){
+  const cut=Date.now() - (state.auditDays||60)*86400000;
+  state.audit=state.audit.filter(a=>a.ts>=cut);
+}
+let auditSeq=0;
+function logAudit(kind,action,who,detail){
+  state.audit.push({ ts:Date.now(), seq:++auditSeq, kind:kind, action:action,
+                     who:who||"", detail:detail||"" });
+  pruneAudit();
+  if (state.tab==="audits") renderAudits();
+}
+/** Newest first; seq breaks ties for changes made in the same millisecond. */
+function auditRows(kind){
+  return state.audit.filter(a=>a.kind===kind)
+    .sort((a,b)=> (b.ts-a.ts) || ((b.seq||0)-(a.seq||0)));
+}
+function downloadCSV(name,rows){
+  const q=v=>'"'+String(v).replace(/"/g,'""')+'"';
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([rows.map(r=>r.map(q).join(",")).join("\n")],{type:"text/csv"}));
+  a.download=name;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+/** Vertical headers only need to be as tall as the longest label. */
+function qHeadStyle(names){
+  let longest=0;
+  names.forEach(x=>{ if (String(x).length>longest) longest=String(x).length; });
+  return "height:"+Math.min(150,Math.max(34,Math.round(longest*6.6+14)))+"px";
+}
+function stationName(id){
+  const st=state.stations.find(x=>x.id===id);
+  if (st) return st.name;
+  const sb=state.standbys.find(x=>x.id===id);
+  return sb?sb.name:id;
+}
+function fmtStamp(ts){
+  if (!ts) return "not yet generated";
+  const d=new Date(ts);
+  return String(d.getMonth()+1).padStart(2,"0")+"/"+String(d.getDate()).padStart(2,"0")+"/"+
+         d.getFullYear()+" at "+String(d.getHours()).padStart(2,"0")+":"+
+         String(d.getMinutes()).padStart(2,"0");
+}
+function L(ds){ return dayBill(ds).lengths; }
+function SB(ds){ return dayBill(ds).standby; }
+function shiftDate(ds,n){
+  const p=String(ds).split("-").map(Number);
+  return iso(new Date(p[0],p[1]-1,p[2]+n));
+}
+/** Everyone holding a watch or a standby that day. */
+function sailorsOnDuty(ds){
+  const b=state.bills[ds], out=new Set();
+  if (!b) return out;
+  Object.keys(b.assign||{}).forEach(k=>{ if(b.assign[k]) out.add(b.assign[k]); });
+  Object.keys(b.standby||{}).forEach(k=>{ if(b.standby[k]) out.add(b.standby[k]); });
+  return out;
+}
+function isOff(sailorId,dateStr){
+  return state.noDuty.some(n=>n.sailorId===sailorId && dateStr>=n.start && dateStr<=n.end);
+}
+function offOn(dateStr){ return state.noDuty.filter(n=>dateStr>=n.start && dateStr<=n.end); }
+
+function stationLen(st,ds){
+  const l=L(ds);
+  return Object.prototype.hasOwnProperty.call(l,st.id) ? l[st.id] : st.len;
+}
+function effLen(st){ return stationLen(st,state.date); }
+function isOverridden(st){
+  return Object.prototype.hasOwnProperty.call(L(),st.id) &&
+         String(L()[st.id])!==String(st.len);
+}
+/** Saturdays, Sundays and anything on the holiday list use the weekend hours. */
+function isWeekendish(dateStr){
+  if (state.holidays[dateStr]) return true;
+  const p=String(dateStr).split("-").map(Number);
+  const d=new Date(p[0],(p[1]||1)-1,p[2]||1).getDay();
+  return d===0 || d===6;
+}
+function schedule(ds){
+  return isWeekendish(ds) ? { s:state.wkndStart, e:state.wkndEnd }
+                          : { s:state.workStart, e:state.workEnd };
+}
+function dateAt(ds,mins){
+  const p=String(ds).split("-").map(Number);
+  return new Date(p[0],p[1]-1,p[2],Math.floor(mins/60),mins%60);
+}
+/**
+ * A duty day starts on its own schedule and ends on the *next* day's, so a Friday
+ * running into a Saturday ends at the weekend hour. Elapsed time is measured with real
+ * dates, which makes the spring-forward and fall-back days come out 23 and 25 hours.
+ */
+function dutyWindow(dateStr){
+  const ds=dateStr||state.date;
+  const start=toMin(schedule(ds).s);
+  const endToday=toMin(schedule(ds).e);
+  const rolls = endToday<=start;
+  const endDs = rolls ? shiftDate(ds,1) : ds;
+  const end = rolls ? toMin(schedule(endDs).e) : endToday;
+  const a=dateAt(ds,start), b=dateAt(endDs,end);
+  let dur=Math.round((b-a)/60000);
+  if (dur<=0) dur+=1440;
+  const naive = (rolls ? end+1440 : end) - start;
+  return { start:start, dur:dur, startTs:a.getTime(), weekend:isWeekendish(ds),
+           endsWeekend:isWeekendish(endDs), shift:dur-naive };
+}
+/** Wall-clock label for a point in the duty day, correct across a DST change. */
+function stamp(ds,off){
+  const t=new Date(dutyWindow(ds).startTs + off*60000);
+  return String(t.getHours()).padStart(2,"0")+String(t.getMinutes()).padStart(2,"0");
+}
+function stampEnd(ds,off){
+  const v=stamp(ds,off);
+  return (off>0 && v==="0000") ? "2400" : v;
+}
+function buildRowsFor(ds){
+  const { dur }=dutyWindow(ds);
+  return state.stations.map(st=>{
+    const chosen=stationLen(st,ds);
+    const len = chosen==="all" ? dur : Math.max(1,Math.min(12,+chosen||6))*60;
+    const segs=[];
+    for (let off=0; off<dur; off+=len) segs.push({ offset:off, length:Math.min(len,dur-off) });
+    return Object.assign({},st,{ segs, allDay: chosen==="all" });
+  });
+}
+function buildRows(){ return buildRowsFor(state.date); }
+function baseUnit(rows,ds){
+  const { dur }=dutyWindow(ds);
+  const hourly=rows.filter(r=>!r.allDay);
+  let g=dur;
+  (hourly.length?hourly:rows).forEach(r=>r.segs.forEach(s=>{ g=gcd(g,s.length); }));
+  let b=Math.max(g,1);
+  while (dur/b>96) b*=2;
+  return b;
+}
+function onDuty(ds){
+  ds=ds||state.date;
+  if (state.dutyModel==="minimal") return dayPool(ds);
+  const sec=dutySection(ds);
+  return state.sailors.filter(s=>{
+    if (isOff(s.id,ds)) return false;
+    if (sec && s.section && String(s.section)!==String(sec)) return false;  // unassigned are always available
+    return true;
+  });
+}
+function eligible(st,ds){
+  return onDuty(ds).filter(s=>(s.quals||[]).indexOf(st.id)!==-1)
+                   .sort((a,b)=>a.name.localeCompare(b.name));
+}
+/** Qualified people from the other sections, offered separately for a manual borrow. */
+function borrowable(st,ds){
+  ds=ds||state.date;
+  return dayPool(ds).filter(s=>sectionTier(s,ds)===1 && (s.quals||[]).indexOf(st.id)!==-1)
+                    .sort((a,b)=>a.name.localeCompare(b.name));
+}
+const BILL_KEEP_DAYS = 30;
+/** Watchbills more than a month old are dead weight; clear them out. */
+function pruneBills(){
+  const cut=shiftDate(todayISO(),-BILL_KEEP_DAYS);
+  let gone=0;
+  Object.keys(state.bills).forEach(ds=>{ if (ds<cut){ delete state.bills[ds]; gone++; } });
+  return gone;
+}
+function pruneAssignments(){
+  Object.keys(state.bills).forEach(ds=>{
+    const b=dayBill(ds);
+    Object.keys(b.assign).forEach(k=>{
+      const stId=k.split("::")[0];
+      const who=sailorById(b.assign[k]);
+      if (!who || (who.quals||[]).indexOf(stId)===-1) delete b.assign[k];
+    });
+    Object.keys(b.standby).forEach(sb=>{
+      const who=sailorById(b.standby[sb]);
+      if (!who || (who.sbQuals||[]).indexOf(sb)===-1) delete b.standby[sb];
+    });
+  });
+}
+function flash(msg){
+  const el=document.getElementById("status");
+  el.textContent=msg;
+  clearTimeout(flash._t);
+  flash._t=setTimeout(()=>{el.textContent="";},2800);
+}
+
+/* ================================================================== */
+/*  STANDBY COVERAGE — one sailor can only fill one station           */
+/* ================================================================== */
+
+/** Maximum bipartite matching (Kuhn's algorithm) of standby watches to sailors. */
+function standbyCoverage(pool){
+  const stations=state.standbys;
+  const qual={};
+  stations.forEach(sb=>{
+    qual[sb.id]=pool.filter(s=>(s.sbQuals||[]).indexOf(sb.id)!==-1).map(s=>s.id);
+  });
+  const matchStation={}, matchSailor={};
+
+  function augment(stId,seen){
+    const cands=qual[stId]||[];
+    for (let i=0;i<cands.length;i++){
+      const sid=cands[i];
+      if (seen[sid]) continue;
+      seen[sid]=1;
+      if (!matchSailor[sid] || augment(matchSailor[sid],seen)){
+        matchSailor[sid]=stId; matchStation[stId]=sid; return true;
+      }
+    }
+    return false;
+  }
+  stations.forEach(sb=>{ if(!matchStation[sb.id]) augment(sb.id,{}); });
+
+  const unmet=stations.filter(sb=>!matchStation[sb.id]);
+
+  /* Why it fails: from an unmet station, walk alternating paths to find the
+     set of stations that collectively have too few qualified sailors. */
+  let why=null;
+  if (unmet.length){
+    const seenSt={}, seenSa={};
+    const stack=[unmet[0].id];
+    seenSt[unmet[0].id]=1;
+    while (stack.length){
+      const cur=stack.pop();
+      (qual[cur]||[]).forEach(sid=>{
+        if (seenSa[sid]) return;
+        seenSa[sid]=1;
+        const m=matchSailor[sid];
+        if (m && !seenSt[m]){ seenSt[m]=1; stack.push(m); }
+      });
+    }
+    why={ stations:Object.keys(seenSt), sailors:Object.keys(seenSa) };
+  }
+  return { matchStation, unmet, qual, why };
+}
+
+function sectionPool(sec){ return state.sailors.filter(s=>String(s.section)===String(sec)); }
+
+/* ================================================================== */
+/*  RULES + AUTO-GENERATION                                           */
+/* ================================================================== */
+
+const MAX_WATCH_HOURS = 13;    // no more than this much watch in a day, all-day watches excepted
+const MAX_WATCH_MIN = MAX_WATCH_HOURS*60;
+
+/** Everyone not off duty on this date. */
+function dayPool(ds){
+  return state.sailors.filter(s=>!isOff(s.id,ds));
+}
+/** 0 = in the duty section (or unassigned), 1 = borrowed. Always 0 with no sections. */
+function sectionTier(s,ds){
+  if (state.dutyModel==="minimal") return 0;
+  const sec=dutySection(ds);
+  if (!sec || !s.section) return 0;
+  return String(s.section)===String(sec) ? 0 : 1;
+}
+/** The duty section for that date, plus anyone with no section. */
+function preferredPool(ds){ return onDuty(ds); }
+
+/** Two watches clash if they overlap OR touch end-to-start (no back-to-back watches). */
+function clashes(a1,b1,a2,b2){ return a1<=b2 && a2<=b1; }
+
+/**
+ * Build one day's watchbill.
+ * Greedy by scarcest station first, then least-loaded sailor, with randomised
+ * restarts. Returns the best attempt rather than throwing if it can't fill everything.
+ */
+/*
+ * Rules are relaxed only when a watch cannot otherwise be manned, cheapest first:
+ *   1 consecutive duty days · 2 back-to-back watches · 3 over 13 hours
+ * Qualification is never relaxed, and nobody is ever put in two places at once.
+ */
+const RULE_CONSEC="Consecutive duty days";
+const BORROW_COST=0.5;   // cheaper than any rule breach, dearer than staying in section
+const RULE_BACK  ="Back-to-back watches";
+const RULE_HOURS = MAX_WATCH_HOURS+"-hour limit";
+
+function solveDay(ds,tries,history,opts){
+  history = history || {};
+  opts = opts || {};
+  const rows=buildRowsFor(ds);
+  const prevNext=new Set();
+  sailorsOnDuty(shiftDate(ds,-1)).forEach(id=>prevNext.add(id));
+  if (!opts.ignoreNext) sailorsOnDuty(shiftDate(ds,1)).forEach(id=>prevNext.add(id));
+
+  /* The duty section first; the rest of the crew only when the section cannot cover a watch. */
+  const pool=dayPool(ds);
+  const tier={};
+  pool.forEach(x=>{ tier[x.id]=sectionTier(x,ds); });
+
+  const segs=[];
+  rows.forEach(r=>{
+    const deps=r.departments||[];
+    r.segs.forEach(sg=>{
+      segs.push({ stId:r.id, name:r.name, offset:sg.offset, length:sg.length, allDay:r.allDay,
+                  deps:deps,
+                  cands: pool.filter(p=>(p.quals||[]).indexOf(r.id)!==-1) });
+    });
+  });
+  /** Not a rule, just a nudge: fill a station from its own departments when possible. */
+  const deptFit=(c,sg)=> (!sg.deps.length || sg.deps.indexOf(c.department)!==-1) ? 0 : 1;
+  const minimise = state.dutyModel==="minimal";
+
+  /** null = physically impossible; otherwise the price of using this sailor. */
+  function price(c,sg,slots,load){
+    const a=sg.offset, b=sg.offset+sg.length, mine=slots[c.id]||[];
+    let cost=0; const broke=[];
+    for (let i=0;i<mine.length;i++){
+      if (a < mine[i].b && mine[i].a < b) return null;          // genuine overlap
+      if (a===mine[i].b || b===mine[i].a){ if (broke.indexOf(RULE_BACK)===-1){ cost+=2; broke.push(RULE_BACK); } }
+    }
+    if (prevNext.has(c.id)){ cost+=1; broke.push(RULE_CONSEC); }
+    if (!sg.allDay && (load[c.id]||0)+sg.length > MAX_WATCH_MIN){ cost+=3; broke.push(RULE_HOURS); }
+    if (tier[c.id]) cost+=BORROW_COST;      // not a rule break, just a last resort
+    return { cost:cost, broke:broke };
+  }
+
+  let best=null;
+  const attempts=tries||60;
+  for (let t=0; t<attempts; t++){
+    const assign={}, load={}, slots={}, broken=[];
+    const order=segs.slice().sort((a,b)=>
+      (a.cands.length-b.cands.length) || (b.length-a.length) || (Math.random()-0.5));
+    let unfilled=0, cost=0;
+    order.forEach(sg=>{
+      const scored=[];
+      sg.cands.forEach(c=>{
+        const p=price(c,sg,slots,load);
+        if (p) scored.push({ c:c, cost:p.cost, broke:p.broke });
+      });
+      if (!scored.length){ unfilled++; return; }
+      const used=id=>(slots[id]||[]).length?0:1;
+      scored.sort(minimise
+        ? (x,y)=>    /* smallest crew: lean on whoever is already aboard */
+             (x.cost-y.cost)
+          || (used(x.c.id)-used(y.c.id))
+          || (deptFit(x.c,sg)-deptFit(y.c,sg))
+          || ((history[x.c.id]||0)-(history[y.c.id]||0))
+          || ((load[x.c.id]||0)-(load[y.c.id]||0))
+          || (Math.random()-0.5)
+        : (x,y)=>    /* the section is aboard anyway: give the idle ones the watch */
+             (x.cost-y.cost)
+          || (tier[x.c.id]-tier[y.c.id])
+          || ((load[x.c.id]||0)-(load[y.c.id]||0))
+          || ((slots[x.c.id]||[]).length-(slots[y.c.id]||[]).length)
+          || ((history[x.c.id]||0)-(history[y.c.id]||0))
+          || (deptFit(x.c,sg)-deptFit(y.c,sg))
+          || (Math.random()-0.5));
+      const pick=scored[0];
+      assign[key(sg.stId,sg.offset)]=pick.c.id;
+      (slots[pick.c.id]=slots[pick.c.id]||[]).push({a:sg.offset,b:sg.offset+sg.length});
+      if (!sg.allDay) load[pick.c.id]=(load[pick.c.id]||0)+sg.length;
+      cost+=pick.cost;
+      pick.broke.forEach(r=>broken.push({ rule:r, who:pick.c.name, where:sg.name }));
+    });
+    /* crew = distinct people used; doubles = people carrying more than one watch */
+    const per={};
+    Object.keys(assign).forEach(k=>{ per[assign[k]]=(per[assign[k]]||0)+1; });
+    const ids=Object.keys(per);
+    const crew=ids.length;
+    let doubles=0;
+    ids.forEach(id=>{ if (per[id]>1) doubles+=per[id]-1; });
+    /* minimising wants a small crew; otherwise nobody should double up while a peer sits idle */
+    const score=unfilled*1000 + cost*10 + (minimise ? crew : doubles*2);
+    if (!best || score<best.score)
+      best={ assign:assign, load:load, unfilled:unfilled, broken:broken,
+             cost:cost, score:score, crew:crew };
+    if (score===0) break;
+  }
+
+  /* Standbys: a perfect matching if one exists; if not, relax the consecutive-day rule. */
+  const rank=minimise
+    ? (a,b)=> (((best.load[a.id]||0)?0:1)-((best.load[b.id]||0)?0:1))   // already aboard first
+           || ((history[a.id]||0)-(history[b.id]||0))
+    : (a,b)=> (tier[a.id]-tier[b.id])
+           || ((best.load[a.id]||0)-(best.load[b.id]||0))               // idle first
+           || ((history[a.id]||0)-(history[b.id]||0));
+  const inSection=pool.filter(s=>!tier[s.id]);
+  const attemptsSb=[
+    { people:inSection.filter(s=>!prevNext.has(s.id)), relaxed:false },   // section, clean
+    { people:pool.filter(s=>!prevNext.has(s.id)),      relaxed:false },   // borrow a section
+    { people:inSection,                                relaxed:true  },   // section, back-to-back day
+    { people:pool,                                     relaxed:true  }
+  ];
+  let cov=null, relaxed=false;
+  for (let i=0;i<attemptsSb.length;i++){
+    const c=standbyCoverage(attemptsSb[i].people.slice().sort(rank));
+    if (!cov || c.unmet.length<cov.unmet.length){ cov=c; relaxed=attemptsSb[i].relaxed; }
+    if (!c.unmet.length) break;
+  }
+  const standby={};
+  state.standbys.forEach(sb=>{ if (cov.matchStation[sb.id]) standby[sb.id]=cov.matchStation[sb.id]; });
+  if (relaxed){
+    state.standbys.forEach(sb=>{
+      const id=standby[sb.id];
+      if (id && prevNext.has(id)){
+        const w=sailorById(id);
+        best.broken.push({ rule:RULE_CONSEC, who:w?w.name:"?", where:sb.name });
+      }
+    });
+  }
+
+  return { assign:best.assign, standby:standby, unfilled:best.unfilled, crew:best.crew,
+           broken:best.broken, standbyShort:cov.unmet.length, poolSize:pool.length };
+}
+
+/* ---------- progress console ---------- */
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const con={
+  _idle:null, _gone:null,
+  /** Idle for 3s, then a 2s fade, then out of the way. Hovering cancels it. */
+  _restart(){
+    const el=document.getElementById("console");
+    clearTimeout(con._idle); clearTimeout(con._gone);
+    el.classList.remove("fading");
+    con._idle=setTimeout(()=>{
+      el.classList.add("fading");
+      con._gone=setTimeout(()=>{ el.hidden=true; el.classList.remove("fading"); },2000);
+    },3000);
+  },
+  open(title){
+    document.getElementById("conTitle").textContent=title;
+    document.getElementById("conBody").innerHTML="";
+    const el=document.getElementById("console");
+    el.hidden=false; el.classList.remove("fading");
+    con._restart();
+  },
+  log(text,cls){
+    const body=document.getElementById("conBody");
+    const line=document.createElement("div");
+    if (cls) line.className=cls;
+    line.textContent=text;
+    body.appendChild(line);
+    body.scrollTop=body.scrollHeight;
+    con._restart();
+  },
+  close(){
+    const el=document.getElementById("console");
+    clearTimeout(con._idle); clearTimeout(con._gone);
+    el.hidden=true; el.classList.remove("fading");
+  }
+};
+document.getElementById("conClose").addEventListener("click",()=>con.close());
+document.getElementById("console").addEventListener("mouseenter",()=>{
+  clearTimeout(con._idle); clearTimeout(con._gone);
+  document.getElementById("console").classList.remove("fading");
+});
+document.getElementById("console").addEventListener("mouseleave",()=>con._restart());
+
+/**
+ * Build one day, retrying twice before settling for a bill that breaks a rule.
+ * Keeps whichever attempt raised the fewest flags.
+ */
+function buildDay(ds,history,log){
+  let best=null;
+  for (let attempt=1; attempt<=3; attempt++){
+    const res=solveDay(ds,80,history);
+    applyDay(ds,res);
+    const v=dayViolations(ds);
+    if (!best || v.length<best.count) best={ res:res, count:v.length, v:v };
+    if (!v.length) break;
+    if (attempt<3 && log)
+      log("   attempt "+attempt+" left "+v.length+" flag"+(v.length===1?"":"s")+", trying again","warn");
+  }
+  applyDay(ds,best.res);
+  return best;
+}
+
+function applyDay(ds,res){
+  const b=dayBill(ds);
+  b.assign=res.assign;
+  b.standby=res.standby;
+  b.updated=Date.now();
+}
+
+async function generateMonth(){
+  const y=state.calYear, m=state.calMonth;
+  const days=new Date(y,m+1,0).getDate();
+  const label=MONTHS[m]+" "+y;
+
+  con.open("Generating "+label);
+  con.log("Reading duty rotation for "+label+"…");
+  await wait(220);
+
+  /* Days already past keep whatever they were given; only today onward is rebuilt. */
+  const today=todayISO();
+  let withSection=0, skipped=0, toBuild=0;
+  for (let d=1; d<=days; d++){
+    const ds=iso(new Date(y,m,d));
+    if (ds<today){ skipped++; continue; }
+    const b=dayBill(ds); b.assign={}; b.standby={};   // clear first: nothing counts as "tomorrow"
+    toBuild++;
+    if (state.duty[ds]) withSection++;
+  }
+  con.log(days+" days · "+toBuild+" to build"+(skipped?" · "+skipped+" already past, left alone":""));
+  con.log(withSection+" of those carry a duty section");
+  con.log(state.stations.length+" watchstations · "+state.standbys.length+" standby watches");
+  con.log("Duty model: "+(state.dutyModel==="minimal"
+    ? "maximize days off"
+    : state.sections.length+" sections · one day on, "+(state.sections.length-1)+" off"));
+  con.log("A full duty day needs about "+dailyDemand(state.date)+" sailors");
+  await wait(260);
+  con.log("Building…","hi");
+  await wait(160);
+
+  const report=[], history={};
+  let clean=0, crewTotal=0;
+  if (!toBuild){
+    await wait(200);
+    con.log("—");
+    con.log("Every day in this month has already passed. Nothing to build.","warn");
+    return report;
+  }
+  for (let d=1; d<=days; d++){
+    const ds=iso(new Date(y,m,d));
+    if (ds<today) continue;
+    const sec=state.duty[ds];
+    const w=dutyWindow(ds);
+    con.log(ordinal(d)+" — "+(state.dutyModel==="minimal"?"open crew":(sec?"Section "+sec:"no section"))+
+            ", "+preferredPool(ds).length+" available, "+(w.dur/60)+"h day"+
+            (w.shift?" (clocks change)":""));
+    await wait(26);
+
+    const built=buildDay(ds,history,(t,c)=>con.log(t,c));
+    buildRowsFor(ds).forEach(r=>r.segs.forEach(sg=>{      // carry the month's load forward
+      const id=built.res.assign[key(r.id,sg.offset)];
+      if (id) history[id]=(history[id]||0)+sg.length;
+    }));
+
+    if (built.count){
+      report.push({ ds:ds, flags:built.count, day:d });
+      con.log("   "+sailorsOnDuty(ds).size+" aboard · settled with "+built.count+
+              " flag"+(built.count===1?"":"s"),"bad");
+    } else clean++;
+    crewTotal+=sailorsOnDuty(ds).size;
+    await wait(12);
+  }
+
+  await wait(200);
+  con.log("—");
+  con.log(clean+" of "+toBuild+" days built clean", clean===toBuild?"good":"hi");
+  con.log("Average crew aboard: "+(crewTotal/toBuild).toFixed(1)+" per duty day");
+  if (report.length){
+    con.log(report.length+" day"+(report.length===1?"":"s")+" flagged: "+
+            report.map(r=>ordinal(r.day)).join(", "),"bad");
+    con.log("Details are in the red Flag panel below the calendar.","bad");
+  } else {
+    con.log("Every watch and standby manned within the rules.","good");
+  }
+  return report;
+}
+
+/**
+ * Roughly how many distinct sailors a full duty day needs, given that nobody may
+ * exceed 13 hours or stand back-to-back watches. All-day watches take one each.
+ */
+function dailyDemand(ds){
+  const rows=buildRowsFor(ds||state.date);
+  let n=0;
+  rows.forEach(r=>{
+    if (r.allDay){ n+=r.segs.length; return; }
+    const len=r.segs.length?r.segs[0].length:0;
+    if (!len) return;
+    const byHours=Math.max(1,Math.floor(MAX_WATCH_MIN/len));   // 13-hour ceiling
+    const byGaps=Math.ceil(r.segs.length/2);                   // no back-to-back
+    n+=Math.ceil(r.segs.length/Math.max(1,Math.min(byHours,byGaps)));
+  });
+  return n;
+}
+
+/** Every rule the bill as it stands actually breaks, and who it lands on. */
+function dayViolations(ds){
+  const rows=buildRowsFor(ds), b=dayBill(ds), per={}, out=[];
+  const add=(rule,msg)=>out.push({ rule:rule, msg:msg });
+
+  rows.forEach(r=>r.segs.forEach(sg=>{
+    const id=b.assign[key(r.id,sg.offset)];
+    const w=dutyWindow(ds);
+    const span=clock(w.start+sg.offset)+"–"+clockEnd(w.start+sg.offset+sg.length);
+    if (!id){ add("Unmanned watch", r.name+" "+span+" has nobody assigned"); return; }
+    const who=sailorById(id);
+    if (!who) return;
+    if ((who.quals||[]).indexOf(r.id)===-1)
+      add("Qualification", who.name+" is not qualified for "+r.name);
+    (per[id]=per[id]||[]).push({ a:sg.offset, b:sg.offset+sg.length, len:sg.length,
+                                 allDay:r.allDay, name:r.name });
+  }));
+
+  Object.keys(per).forEach(id=>{
+    const who=sailorById(id);
+    const list=per[id].sort((x,y)=>x.a-y.a);
+    let mins=0;
+    list.forEach(x=>{ if(!x.allDay) mins+=x.len; });
+    if (mins>MAX_WATCH_MIN) add(RULE_HOURS, who.name+" stands "+hrs(mins)+" hours of watch");
+    for (let i=1;i<list.length;i++)
+      if (clashes(list[i].a,list[i].b,list[i-1].a,list[i-1].b))
+        add(RULE_BACK, who.name+" stands "+list[i-1].name+" then "+list[i].name+" with no break");
+  });
+
+  const used={};
+  state.standbys.forEach(sb=>{
+    const id=b.standby[sb.id];
+    if (!id){ add("Standby manning", sb.name+" has nobody assigned"); return; }
+    const who=sailorById(id);
+    if (!who) return;
+    if ((who.sbQuals||[]).indexOf(sb.id)===-1)
+      add("Qualification", who.name+" is not qualified for "+sb.name);
+    if (used[id]) add("Standby manning", who.name+" is covering two standby watches");
+    used[id]=1;
+  });
+
+  const prev=sailorsOnDuty(shiftDate(ds,-1));
+  sailorsOnDuty(ds).forEach(id=>{
+    if (prev.has(id)){
+      const who=sailorById(id);
+      if (who) add(RULE_CONSEC, who.name+" also had duty on "+shiftDate(ds,-1));
+    }
+  });
+  return out;
+}
+
+/** Cell keys that break a rule, with the reason, so the bill can paint them red. */
+function flaggedCells(ds){
+  const rows=buildRowsFor(ds), b=dayBill(ds), per={}, out={};
+  const mark=(k,why)=>{ out[k]=out[k]?out[k]+"; "+why:why; };
+  rows.forEach(r=>r.segs.forEach(sg=>{
+    const k=key(r.id,sg.offset), id=b.assign[k];
+    if (!id){ mark(k,"Nobody assigned"); return; }
+    const who=sailorById(id);
+    if (!who) return;
+    if ((who.quals||[]).indexOf(r.id)===-1) mark(k,who.name+" is not qualified");
+    (per[id]=per[id]||[]).push({ k:k, a:sg.offset, b:sg.offset+sg.length,
+                                 len:sg.length, allDay:r.allDay, name:r.name });
+  }));
+  Object.keys(per).forEach(id=>{
+    const who=sailorById(id);
+    const list=per[id].sort((x,y)=>x.a-y.a);
+    let mins=0;
+    list.forEach(x=>{ if(!x.allDay) mins+=x.len; });
+    if (mins>MAX_WATCH_MIN) list.forEach(x=>mark(x.k,who.name+" stands "+hrs(mins)+" hours today"));
+    for (let i=1;i<list.length;i++)
+      if (clashes(list[i].a,list[i].b,list[i-1].a,list[i-1].b)){
+        mark(list[i-1].k,who.name+" has no break before "+list[i].name);
+        mark(list[i].k,who.name+" came straight off "+list[i-1].name);
+      }
+  });
+  return out;
+}
+
+/** A day only counts as built once something has been assigned to it. */
+function hasBill(ds){
+  const b=state.bills[ds];
+  return !!(b && (Object.keys(b.assign||{}).length || Object.keys(b.standby||{}).length));
+}
+
+/** Group violations by rule for display. */
+function groupViolations(list){
+  const order=[], by={};
+  list.forEach(v=>{ if(!by[v.rule]){ by[v.rule]=[]; order.push(v.rule); } by[v.rule].push(v.msg); });
+  return order.map(r=>({ rule:r, msgs:by[r] }));
+}
+
+/* ================================================================== */
+/*  RENDER — DAILY WATCHBILL                                          */
+/* ================================================================== */
+
+function lengthOptions(sel){
+  let o="";
+  for (let i=1;i<=12;i++) o+="<option value='"+i+"'"+(String(sel)===String(i)?" selected":"")+">"+i+" hr</option>";
+  o+="<option value='all'"+(sel==="all"?" selected":"")+">All day</option>";
+  return o;
+}
+
+const WEEKDAYS=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+function longDate(ds){
+  const p=String(ds).split("-").map(Number);
+  const d=new Date(p[0],p[1]-1,p[2]);
+  return WEEKDAYS[d.getDay()]+" "+ordinal(p[2])+" "+MONTHS[p[1]-1]+" "+p[0];
+}
+function renderHeaderBits(){
+  const w=dutyWindow();
+  document.getElementById("dayline").innerHTML=
+    esc(longDate(state.date))+"<span class='dot'>·</span><b>"+stamp(state.date,0)+"</b> to <b>"+
+    stampEnd(state.date,w.dur)+"</b>"+
+    (w.shift ? "<span class='dot'>·</span><span style='color:var(--warn)'>"+
+       (w.shift>0?"+":"")+(w.shift/60)+" hr, clocks change</span>" : "");
+}
+
+function renderBill(){
+  renderHeaderBits();
+  const w=dutyWindow(), dur=w.dur;
+  const rows=buildRows();
+  const base=baseUnit(rows);
+  const nCols=Math.max(1,Math.round(dur/base));
+  const flags=flaggedCells(state.date);
+
+  let h="<thead><tr><th class='th-station'>Watch</th><th class='th-len'>Length</th>";
+  for (let i=0;i<nCols;i++){
+    const off=i*base;
+    h+="<th class='th-period"+(isNight(w.start+off+base/2)?" night":"")+"'>"+stamp(state.date,off)+"</th>";
+  }
+  h+="</tr></thead><tbody>";
+
+  if (!rows.length){
+    h+="<tr><td class='td-station' colspan='"+(nCols+2)+"' style='padding:16px'>"+
+       "<span class='empty'>No watchstations yet. Add some under Management.</span></td></tr>";
+  }
+
+  rows.filter(r=>!r.allDay).forEach(st=>{
+    h+="<tr><th class='td-station' scope='row'>"+esc(st.name)+"</th>"+
+       "<td class='td-len'><select class='lensel' data-len='"+st.id+
+       "' aria-label='"+esc(st.name)+" watch length for this day'>"+lengthOptions(effLen(st))+"</select></td>";
+    const pool=eligible(st);
+    st.segs.forEach(s=>{
+      const k=key(st.id,s.offset);
+      const span=Math.max(1,Math.round(s.length/base));
+      const from=stamp(state.date,s.offset), to=stampEnd(state.date,s.offset+s.length);
+      const assigned=A()[k]||"";
+      const who=assigned?sailorById(assigned):null;
+      const bad=flags[k];
+      const cls="cell"+(isNight(w.start+s.offset+s.length/2)?" night":"")+
+                (bad?" conflict":"")+(!pool.length&&!assigned?" nopool":"");
+      let opts="<option value=''>—</option>"+
+        pool.map(p=>"<option value='"+p.id+"'"+(assigned===p.id?" selected":"")+">"+esc(p.name)+"</option>").join("");
+      const lend=borrowable(st);
+      if (lend.length)
+        opts+="<optgroup label='Other sections'>"+lend.map(p=>"<option value='"+p.id+"'"+
+          (assigned===p.id?" selected":"")+">"+esc(p.name)+"</option>").join("")+"</optgroup>";
+      if (assigned && who && !pool.some(p=>p.id===assigned) && !lend.some(p=>p.id===assigned)){
+        opts+="<optgroup label='Off duty'><option value='"+who.id+"' selected>"+esc(who.name)+"</option></optgroup>";
+      }
+      h+="<td class='"+cls+"' colspan='"+span+"'"+(bad?" title='"+esc(bad)+"'":"")+">"+
+         "<select data-k='"+k+"' aria-label='"+esc(st.name)+" "+from+" to "+to+"'>"+opts+"</select></td>";
+    });
+    h+="</tr>";
+  });
+
+  h+="</tbody>";
+  document.getElementById("billTable").innerHTML=h;
+  renderAllDay(rows,flags);
+  renderReadout(rows);
+}
+
+/** Red notice naming each rule that had to be broken, and who it lands on. */
+function breachHTML(list,lede){
+  if (!list.length) return "";
+  const groups=groupViolations(list);
+  return "<div class='breach'><h3>Flag</h3>"+
+    "<p class='lede'>"+esc(lede)+"</p><ul>"+
+    groups.map(g=>g.msgs.map(m=>"<li><b>"+esc(g.rule)+"</b> · <span class='who'>"+esc(m)+"</span></li>").join("")).join("")+
+    "</ul></div>";
+}
+
+/** All-day watches sit in their own strip: watch name across the top, sailor underneath. */
+function renderAllDay(rows,flags){
+  const allday=rows.filter(r=>r.allDay);
+  const wrap=document.getElementById("alldayWrap");
+  if (!allday.length){ wrap.hidden=true; document.getElementById("alldayTable").innerHTML=""; return; }
+  wrap.hidden=false;
+
+  let head="<thead><tr>", pick="<tbody><tr>";
+  allday.forEach(st=>{
+    const sg=st.segs[0];
+    const k=key(st.id,sg.offset);
+    const assigned=A()[k]||"";
+    const who=assigned?sailorById(assigned):null;
+    const pool=eligible(st);
+    const bad=flags[k];
+    let opts="<option value=''>—</option>"+
+      pool.map(p=>"<option value='"+p.id+"'"+(assigned===p.id?" selected":"")+">"+esc(p.name)+"</option>").join("");
+    const lend=borrowable(st);
+    if (lend.length)
+      opts+="<optgroup label='Other sections'>"+lend.map(p=>"<option value='"+p.id+"'"+
+        (assigned===p.id?" selected":"")+">"+esc(p.name)+"</option>").join("")+"</optgroup>";
+    if (assigned && who && !pool.some(p=>p.id===assigned) && !lend.some(p=>p.id===assigned))
+      opts+="<optgroup label='Off duty'><option value='"+who.id+"' selected>"+esc(who.name)+"</option></optgroup>";
+
+    head+="<th>"+esc(st.name)+"</th>";
+    pick+="<td class='"+(bad?"conflict":"")+(!pool.length&&!assigned?" nopool":"")+"'"+
+          (bad?" title='"+esc(bad)+"'":"")+">"+
+          "<select data-k='"+k+"' aria-label='"+esc(st.name)+"'>"+opts+"</select></td>";
+  });
+  document.getElementById("alldayTable").innerHTML=head+"</tr></thead>"+pick+"</tr></tbody>";
+}
+
+function renderReadout(rows){
+  const b=dayBill(), pool=onDuty();
+  const taken={};
+  state.standbys.forEach(sb=>{ if (b.standby[sb.id]) taken[b.standby[sb.id]]=sb.id; });
+
+  /* ---- box 1: standby watches and who has them ---- */
+  let sb="<div class='rblock'><h3>Standby watches</h3>";
+  if (!state.standbys.length){
+    sb+="<p class='empty'>No standby watches defined.</p>";
+  } else {
+    sb+=state.standbys.map(st=>{
+      const cur=b.standby[st.id]||"";
+      const free=p=>!taken[p.id] || taken[p.id]===st.id;
+      const cands=pool.filter(p=>(p.sbQuals||[]).indexOf(st.id)!==-1 && free(p))
+                      .sort((a,b)=>a.name.localeCompare(b.name));
+      const lend=dayPool(state.date).filter(p=>sectionTier(p,state.date)===1 &&
+                       (p.sbQuals||[]).indexOf(st.id)!==-1 && free(p))
+                      .sort((a,b)=>a.name.localeCompare(b.name));
+      let opts="<option value=''>— nobody —</option>"+
+        cands.map(c=>"<option value='"+c.id+"'"+(cur===c.id?" selected":"")+">"+esc(c.name)+"</option>").join("");
+      if (lend.length)
+        opts+="<optgroup label='Other sections'>"+lend.map(c=>"<option value='"+c.id+"'"+
+          (cur===c.id?" selected":"")+">"+esc(c.name)+"</option>").join("")+"</optgroup>";
+      const who=cur?sailorById(cur):null;
+      if (who && !cands.some(c=>c.id===cur) && !lend.some(c=>c.id===cur))
+        opts+="<option value='"+who.id+"' selected>"+esc(who.name)+"</option>";
+      return "<div class='sbrow"+(cur?"":" gap")+"'><span>"+esc(st.name)+"</span>"+
+             "<select data-sb='"+st.id+"' aria-label='"+esc(st.name)+"'>"+opts+"</select></div>";
+    }).join("");
+  }
+  sb+="</div>";
+
+  /* ---- box 2: who is on duty, by department ---- */
+  const load={};
+  rows.forEach(r=>r.segs.forEach(sg=>{
+    const id=b.assign[key(r.id,sg.offset)];
+    if (id) load[id]=(load[id]||0)+sg.length;
+  }));
+  const onIds=sailorsOnDuty(state.date);
+  const roster = state.dutyModel==="minimal"
+    ? state.sailors.filter(x=>onIds.has(x.id))          // only the crew actually aboard
+    : onDuty().concat(state.sailors.filter(x=>sectionTier(x,state.date)===1 && onIds.has(x.id)));
+  let od="<div class='rblock rwide'><h3>On duty · "+roster.length+" aboard"+
+    (state.dutyModel==="minimal" ? ""
+      : (dutySection(state.date)?" · Section "+esc(dutySection(state.date)):" · no section set"))+"</h3>";
+  const depts=state.departments.concat(
+    roster.some(x=>state.departments.indexOf(x.department)===-1) ? ["Other"] : []);
+  let any=false;
+  depts.forEach(dep=>{
+    const people=roster.filter(x=>(state.departments.indexOf(x.department)===-1?"Other":x.department)===dep)
+                       .sort((x,y)=>x.name.localeCompare(y.name));
+    if (!people.length) return;
+    any=true;
+    od+="<div class='deptblock'><h4>"+esc(dep)+" <span class='qsum'>"+people.length+"</span></h4>"+
+      "<div class='deptnames'>"+people.map(x=>{
+        const mins=load[x.id]||0;
+        const lent=sectionTier(x,state.date)===1;
+        return "<span class='"+(mins?"":"idle")+(lent?" borrowed":"")+"'"+
+          (lent?" title='Borrowed from Section "+esc(x.section)+"'":"")+">"+esc(x.name)+
+          (mins?"<b>"+hrs(mins)+"h</b>":"")+"</span>";
+      }).join("")+"</div></div>";
+  });
+  if (!any) od+="<p class='empty'>Nobody is on duty for this date.</p>";
+  od+="</div>";
+
+  document.getElementById("readout").innerHTML=sb+od;
+
+  /* ---- red notice ---- */
+  const viol=hasBill(state.date)?dayViolations(state.date):[];
+  document.getElementById("billBreach").innerHTML=
+    breachHTML(viol,"This day's watchbill could not be built without breaking the rules below.");
+}
+
+/* ================================================================== */
+/*  RENDER — PRINTOFFS                                                */
+/* ================================================================== */
+
+function sigHTML(){
+  return "<div class='sigblock'>"+state.signatures.map(r=>
+    "<div class='sig'>"+
+      "<span class='lbl'>"+esc(r)+"</span>"+
+      "<span class='line'></span><span class='cap'>Signature</span>"+
+      "<span class='line short'></span><span class='cap'>Date</span>"+
+    "</div>").join("")+"</div>";
+}
+
+function renderBillPrint(){
+  const ds=state.date, w=dutyWindow(ds), rows=buildRowsFor(ds), b=dayBill(ds);
+  const base=baseUnit(rows,ds), nCols=Math.max(1,Math.round(w.dur/base));
+  const sec=dutySection(ds);
+
+  let h="<div class='hdr'><div><h1>"+esc(state.command)+"</h1>"+
+    "<p class='sub'>Daily Watchbill &nbsp;·&nbsp; "+esc(longDate(ds))+"</p></div>"+
+    "<div class='sub'>Last updated: "+esc(fmtStamp(b.updated))+"</div></div>";
+
+  const allday=rows.filter(r=>r.allDay), hourly=rows.filter(r=>!r.allDay);
+
+  if (allday.length){
+    h+="<table class='adsheet'><thead><tr>"+
+       allday.map(r=>"<th>"+esc(r.name)+"</th>").join("")+"</tr></thead><tbody><tr>"+
+       allday.map(r=>{
+         const who=sailorById(b.assign[key(r.id,r.segs[0].offset)]);
+         return "<td"+(who?"":" class='blank'")+">"+(who?esc(who.name):"— not manned —")+"</td>";
+       }).join("")+"</tr></tbody></table>";
+  }
+
+  if (hourly.length){
+    h+="<table style='margin-top:14px'><thead><tr><th>Watch</th>";
+    for (let i=0;i<nCols;i++) h+="<th>"+stamp(ds,i*base)+"</th>";
+    h+="</tr></thead><tbody>";
+    hourly.forEach(r=>{
+      h+="<tr><td class='st'>"+esc(r.name)+"</td>";
+      r.segs.forEach(sg=>{
+        const who=sailorById(b.assign[key(r.id,sg.offset)]);
+        const span=Math.max(1,Math.round(sg.length/base));
+        h+="<td colspan='"+span+"'"+(who?"":" class='blank'")+">"+
+           (who?esc(who.name):"— not manned —")+"</td>";
+      });
+      h+="</tr>";
+    });
+    h+="</tbody></table>";
+  }
+
+  if (state.standbys.length){
+    h+="<h2>Standby watches</h2><table class='narrowtable'><tbody>";
+    state.standbys.forEach(sb=>{
+      const who=sailorById(b.standby[sb.id]);
+      h+="<tr><td class='st'>"+esc(sb.name)+"</td>"+
+         "<td"+(who?"":" class='blank'")+">"+(who?esc(who.name):"— not manned —")+"</td></tr>";
+    });
+    h+="</tbody></table>";
+  }
+
+  const off=offOn(ds);
+  if (off.length){
+    h+="<h2>Off duty</h2><table class='narrowtable'><tbody>"+off.map(n=>{
+      const sa=sailorById(n.sailorId);
+      return "<tr><td class='st' style='width:180px'>"+esc(sa?sa.name:"(removed)")+"</td>"+
+             "<td>"+esc(n.reason||"—")+"</td></tr>";
+    }).join("")+"</tbody></table>";
+  }
+
+  h+=sigHTML();
+  document.getElementById("billSheet").innerHTML=h;
+}
+
+function renderCalPrint(){
+  const y=state.calYear, m=state.calMonth;
+  const days=new Date(y,m+1,0).getDate();
+  const showAll=state.calPrintAll;
+  let latest=0;
+  for (let d=1; d<=days; d++){
+    const u=(state.bills[iso(new Date(y,m,d))]||{}).updated||0;
+    if (u>latest) latest=u;
+  }
+
+  /* what each sailor is doing on each day of the month */
+  const grid={};
+  for (let d=1; d<=days; d++){
+    const ds=iso(new Date(y,m,d));
+    const bl=state.bills[ds];
+    if (!bl) continue;
+    const mark = state.duty[ds] || "D";      // the section they stood with, or just "on duty"
+    sailorsOnDuty(ds).forEach(id=>{ (grid[id]=grid[id]||{})[d]=mark; });
+    state.standbys.forEach(sb=>{
+      const id=(bl.standby||{})[sb.id];
+      if (id) (grid[id]=grid[id]||{})[d]=mark;
+    });
+  }
+
+  /* someone on leave all month has no watches, but still belongs on the sheet */
+  const firstDs=iso(new Date(y,m,1)), lastDs=iso(new Date(y,m,days));
+  const onLeave={};
+  state.noDuty.forEach(n=>{ if (n.start<=lastDs && n.end>=firstDs) onLeave[n.sailorId]=true; });
+
+  const depts=state.departments.concat(["Other"]);
+  let h="<div class='hdr'><div><h1>"+esc(state.command)+"</h1>"+
+    "<p class='sub'>Duty Calendar &nbsp;·&nbsp; "+MONTHS[m]+" "+y+
+    "<br><span style='font-size:11px'>The number in a cell is the duty section stood that day; "+
+    "a slash marks leave</span></p></div>"+
+    "<div class='sub'>Last updated: "+esc(fmtStamp(latest))+"</div></div>";
+
+  h+="<div class='calsheetwrap'><table class='msheet'><thead><tr><th class='nm'>Sailor</th>";
+  for (let d=1; d<=days; d++){
+    const ds=iso(new Date(y,m,d));
+    const dow=new Date(y,m,d).getDay();
+    const cls=(state.holidays[ds]||dow===0||dow===6)?"we":"";
+    h+="<th class='"+cls+"'>"+d+"</th>";
+  }
+  h+="</tr></thead><tbody>";
+
+
+  depts.forEach(dep=>{
+    const people=state.sailors
+      .filter(x=>(state.departments.indexOf(x.department)===-1?"Other":x.department)===dep)
+      .filter(x=>showAll || grid[x.id] || onLeave[x.id])
+      .sort((a,b)=>a.name.localeCompare(b.name));
+    if (!people.length) return;
+    h+="<tr class='dept'><td class='nm' colspan='"+(days+1)+"'>"+esc(dep)+"</td></tr>";
+    const duty=(id,d)=>(grid[id]||{})[d]||"";
+    people.forEach(sa=>{
+      h+="<tr><td class='nm'>"+esc(sa.name)+"</td>";
+      for (let d=1; d<=days; d++){
+        const ds=iso(new Date(y,m,d));
+        const dow=new Date(y,m,d).getDay();
+        const off=isOff(sa.id,ds);
+        const weekend=(state.holidays[ds]||dow===0||dow===6);
+        const mark=duty(sa.id,d);
+        const cls=(off?"leave":(mark?"duty":(weekend?"we":"")));
+        h+="<td class='"+cls+"'>"+(off?"":esc(mark))+"</td>";
+      }
+      h+="</tr>";
+    });
+  });
+  h+="</tbody></table></div>";
+  h+=sigHTML();
+  document.getElementById("calSheet").innerHTML=h;
+}
+
+function renderAudits(){
+  pruneAudit();
+  document.getElementById("auditDays").value=String(state.auditDays);
+  document.getElementById("auditCount").textContent=
+    state.audit.length+" entr"+(state.audit.length===1?"y":"ies")+" on record";
+
+  const cls=a=> a.action.indexOf("Added")===0||a.action.indexOf("Qualified")===0 ? "add"
+             : a.action.indexOf("Removed")===0||a.action.indexOf("Unqualified")===0 ? "del" : "chg";
+  const table=rows=> rows.length
+    ? "<div class='logwrap'><table class='logtable'><thead><tr><th>When</th><th>Action</th>"+
+      "<th>"+esc(crewWord(true,false))+"</th><th>Detail</th></tr></thead><tbody>"+
+      rows.slice(0,300).map(a=>"<tr><td class='when'>"+esc(fmtStamp(a.ts))+"</td>"+
+        "<td class='act "+cls(a)+"'>"+esc(a.action)+"</td><td>"+esc(a.who)+"</td>"+
+        "<td class='detail'>"+esc(a.detail)+"</td></tr>").join("")+
+      "</tbody></table></div>"+
+      (rows.length>300?"<p class='tiny'>Showing the newest 300 of "+rows.length+". Export for the rest.</p>":"")
+    : "<p class='empty' style='padding:6px 0'>Nothing logged yet.</p>";
+
+  document.getElementById("auditSailor").innerHTML=table(auditRows("sailor"));
+  document.getElementById("auditCal").innerHTML=table(auditRows("calendar"));
+}
+
+const THEMES=[
+  { id:"slate", name:"Slate", note:"Easy on the eyes",
+    swatch:["#1b2126","#232b31","#d3a03c","#e9ecee"] },
+  { id:"chart", name:"Bright", note:"Hurts my eyes",
+    swatch:["#f2f6fb","#ffffff","#1d4f8f","#12243c"] },
+  { id:"halloween", name:"Halloween", note:"Spooky!",
+    swatch:["#141019","#2a2034","#ff8b25","#b98cf0"] },
+  { id:"submarines", name:"Submariner", note:"...and proud of it!",
+    swatch:["#fff2f8","#ffe1ef","#e5399b","#2dd4bf"] },
+];
+function applyTheme(){
+  document.documentElement.setAttribute("data-theme",state.theme||"slate");
+  applyVocabulary();
+}
+/** Static labels that name the crew, refreshed whenever the theme changes. */
+function applyVocabulary(){
+  const one=crewWord(true,false), many=crewWord(true,true);
+  const set=(sel,txt)=>{ const el=document.querySelector(sel); if (el) el.textContent=txt; };
+  set('.subtab[data-tab="sailors"]',many);
+  set("#addCrewHead","Add a "+crewWord(false,false));
+  set("#ndCrewLbl",one);
+  set("#asCrewLbl",one);
+}
+/** Read-only look at any day, for the calendar's view button. */
+function dayPreviewHTML(ds){
+  if (!hasBill(ds))
+    return "<p class='none'>Nothing has been assigned for this day yet. "+
+           "Generate the month, or open it in the editor.</p>";
+  const w=dutyWindow(ds), rows=buildRowsFor(ds), b=dayBill(ds);
+  const base=baseUnit(rows,ds), nCols=Math.max(1,Math.round(w.dur/base));
+  const allday=rows.filter(r=>r.allDay), hourly=rows.filter(r=>!r.allDay);
+  const sec=dutySection(ds);
+  let h="<div class='pv'>";
+
+  if (allday.length){
+    h+="<h4>All day</h4><table><thead><tr>"+
+       allday.map(r=>"<th>"+esc(r.name)+"</th>").join("")+"</tr></thead><tbody><tr>"+
+       allday.map(r=>{
+         const who=sailorById(b.assign[key(r.id,r.segs[0].offset)]);
+         return "<td"+(who?"":" class='gap'")+">"+(who?esc(who.name):"not manned")+"</td>";
+       }).join("")+"</tr></tbody></table>";
+  }
+  if (hourly.length){
+    h+="<h4>Rotating watches</h4><table><thead><tr><th>Watch</th>";
+    for (let i=0;i<nCols;i++) h+="<th>"+stamp(ds,i*base)+"</th>";
+    h+="</tr></thead><tbody>";
+    hourly.forEach(r=>{
+      h+="<tr><td class='st'>"+esc(r.name)+"</td>";
+      r.segs.forEach(sg=>{
+        const who=sailorById(b.assign[key(r.id,sg.offset)]);
+        h+="<td colspan='"+Math.max(1,Math.round(sg.length/base))+"'"+(who?"":" class='gap'")+">"+
+           (who?esc(who.name):"not manned")+"</td>";
+      });
+      h+="</tr>";
+    });
+    h+="</tbody></table>";
+  }
+  if (state.standbys.length){
+    h+="<h4>Standby watches</h4><table><tbody>";
+    state.standbys.forEach(sb=>{
+      const who=sailorById(b.standby[sb.id]);
+      h+="<tr><td class='st'>"+esc(sb.name)+"</td><td"+(who?"":" class='gap'")+">"+
+         (who?esc(who.name):"not manned")+"</td></tr>";
+    });
+    h+="</tbody></table>";
+  }
+  const off=offOn(ds);
+  if (off.length){
+    h+="<h4>Off duty</h4><table><tbody>"+off.map(n=>{
+      const sa=sailorById(n.sailorId);
+      return "<tr><td class='st'>"+esc(sa?sa.name:"(removed)")+"</td><td>"+esc(n.reason||"—")+"</td></tr>";
+    }).join("")+"</tbody></table>";
+  }
+  const v=dayViolations(ds);
+  if (v.length) h+=breachHTML(v,"This day's watchbill breaks the rules below.");
+  h+="</div>";
+  return h;
+}
+
+let modalDate=null;
+function openDayModal(ds){
+  modalDate=ds;
+  const sec=dutySection(ds);
+  document.getElementById("modalTitle").textContent=
+    longDate(ds)+(state.dutyModel!=="minimal"&&sec?" · Section "+sec:"");
+  document.getElementById("modalBody").innerHTML=dayPreviewHTML(ds);
+  document.getElementById("dayModal").hidden=false;
+}
+function closeDayModal(){ document.getElementById("dayModal").hidden=true; modalDate=null; }
+
+function renderSettings(){
+  document.getElementById("setCommand").value=state.command;
+  document.getElementById("expName").value=state.exportName||"";
+  document.getElementById("autosave").checked=!!state.autosave;
+  renderSaveState();
+  document.getElementById("themeRow").innerHTML=THEMES.map(t=>
+    "<button class='themecard' data-theme='"+t.id+"' aria-pressed='"+(state.theme===t.id)+"'>"+
+    "<span class='nm'>"+esc(t.name)+"</span><span class='ds'>"+esc(t.note)+"</span>"+
+    "<span class='swatches'>"+t.swatch.map(c=>"<i style='background:"+c+"'></i>").join("")+
+    "</span></button>").join("");
+  document.getElementById("sigList").innerHTML=state.signatures.map((r,i)=>
+    "<li class='rowline' data-i='"+i+"'>"+
+    "<span class='c-num'>"+(i+1)+"</span>"+
+    "<input data-sig='"+i+"' value='"+esc(r)+"' maxlength='32' style='width:280px' aria-label='Signature line' />"+
+    "<button class='rowdel always' data-delsig='"+i+"' title='Remove'>&#10005;</button></li>").join("")
+    || "<li class='rowline'><span class='empty'>No signature lines.</span></li>";
+}
+
+/* ================================================================== */
+/*  RENDER — DUTY CALENDAR                                            */
+/* ================================================================== */
+
+function sectionOptions(sel,blank){
+  let o = blank ? "<option value=''>—</option>" : "";
+  state.sections.forEach(s=>{
+    o+="<option value='"+esc(s)+"'"+(String(sel)===String(s)?" selected":"")+">"+esc(s)+"</option>";
+  });
+  return o;
+}
+/** Rebuild the sections list and spread the crew evenly across it. */
+function applyDutyModel(model){
+  state.dutyModel=model;
+  state.bills={};
+  if (model==="minimal") return;
+
+  const n=+model;
+  state.sections=[];
+  for (let i=1;i<=n;i++) state.sections.push(String(i));
+
+  /* Deal sailors out by qualification profile so every section gets the same mix
+     of officers, chiefs and watchstanders rather than a random slice. */
+  const groups={};
+  state.sailors.forEach(sa=>{
+    const sig=(sa.quals||[]).slice().sort().join("|")+"//"+sa.department;
+    (groups[sig]=groups[sig]||[]).push(sa);
+  });
+  let turn=0;
+  Object.keys(groups).sort().forEach(sig=>{
+    groups[sig].forEach(sa=>{ sa.section=state.sections[turn++ % n]; });
+  });
+  logAudit("sailor","Sections rebuilt","(all hands)",
+    n+" sections · crew redistributed evenly");
+}
+
+/** Fill the shown month's rotation, carrying on from the previous month. */
+function fillRotation(){
+  if (state.dutyModel==="minimal"){ state.duty={}; return 0; }
+  const y=state.calYear, m=state.calMonth;
+  const days=new Date(y,m+1,0).getDate();
+  const secs=state.sections;
+  let idx=secs.indexOf(rotationSeed());
+  if (idx<0) idx=0;
+  for (let d=1; d<=days; d++){
+    state.duty[iso(new Date(y,m,d))]=secs[(idx+d-1)%secs.length];
+  }
+  return days;
+}
+
+/**
+ * What the 1st of the shown month should be. Whatever is already set on the 1st wins,
+ * so you can change that one day and have the rest follow it. Otherwise it carries on
+ * from the last day of the previous month.
+ */
+function rotationSeed(){
+  if (!state.sections.length) return "";
+  const first=iso(new Date(state.calYear,state.calMonth,1));
+  const onFirst=state.duty[first];
+  if (onFirst && state.sections.indexOf(onFirst)!==-1) return onFirst;
+  const prev=state.duty[shiftDate(first,-1)];
+  const at=state.sections.indexOf(prev);
+  if (at<0) return state.sections[0];
+  return state.sections[(at+1)%state.sections.length];
+}
+function syncSectionSelects(){
+  document.getElementById("dutyModel").value=state.dutyModel;
+  document.getElementById("asSec").innerHTML=sectionOptions(state.sections[0],false);
+  const b=document.getElementById("sbSecFilter");
+  b.innerHTML="<option value=''>All sections</option>"+
+    state.sections.map(s=>"<option value='"+esc(s)+"'>Section "+esc(s)+"</option>").join("");
+  b.value=state.sbSec;
+}
+
+/** Only what touches the month on screen. */
+function inShownMonth(start,end){
+  const first=iso(new Date(state.calYear,state.calMonth,1));
+  const last=iso(new Date(state.calYear,state.calMonth+1,0));
+  return start<=last && end>=first;
+}
+function renderHolidays(){
+  const items={};
+  Object.keys(state.holidays).forEach(ds=>{
+    if (!inShownMonth(ds,ds)) return;
+    const label=typeof state.holidays[ds]==="string" ? state.holidays[ds] : "Holiday";
+    items[ds]=label;
+  });
+  const keys=Object.keys(items).sort();
+  document.getElementById("holCount").textContent =
+    keys.length ? keys.length+" this month" : "";
+  document.getElementById("holListing").innerHTML = keys.length
+    ? "<table class='ndtable'><thead><tr><th>Date</th><th>Name</th><th></th></tr></thead><tbody>"+
+      keys.map(ds=>"<tr><td class='range'>"+esc(ordinal(+ds.slice(8))+" "+MONTHS[+ds.slice(5,7)-1])+
+        "</td><td class='reason'>"+esc(items[ds])+"</td>"+
+        "<td class='act'><button class='icon icon-danger' data-hol='"+ds+"' aria-label='Remove'>&#10005;</button></td></tr>").join("")+
+      "</tbody></table>"
+    : "<p class='empty' style='padding:6px 0'>No holidays this month.</p>";
+}
+function renderNoDuty(){
+  const today=todayISO();
+  const rows=state.noDuty.filter(n=>inShownMonth(n.start,n.end))
+    .sort((a,b)=> a.start.localeCompare(b.start) || a.sailorId.localeCompare(b.sailorId));
+  document.getElementById("ndCount").textContent = rows.length ? rows.length+" this month" : "";
+  document.getElementById("ndListing").innerHTML = rows.length
+    ? "<table class='ndtable'><thead><tr><th>Sailor</th><th>Dates</th><th>Reason</th><th></th></tr></thead><tbody>"+
+      rows.map(n=>{
+        const s=sailorById(n.sailorId);
+        return "<tr"+(n.end<today?" class='past'":"")+">"+
+          "<td>"+esc(s?s.name:"(removed)")+"</td>"+
+          "<td class='range'>"+esc(n.start)+(n.end!==n.start?" → "+esc(n.end):"")+"</td>"+
+          "<td class='reason'>"+esc(n.reason||"—")+"</td>"+
+          "<td class='act'><button class='icon icon-danger' data-nd='"+n.id+"' aria-label='Remove'>&#10005;</button></td></tr>";
+      }).join("")+"</tbody></table>"
+    : "<p class='empty' style='padding:6px 0'>Nobody is marked off duty this month.</p>";
+}
+
+function renderCalendar(){
+  syncSectionSelects(); renderNoDuty(); renderHolidays();
+  const y=state.calYear, m=state.calMonth;
+  const firstDow=new Date(y,m,1).getDay();
+  const days=new Date(y,m+1,0).getDate();
+
+  const today=todayISO();
+
+  let h=DOW.map(d=>"<div class='caldow'>"+d+"</div>").join("");
+  for (let i=0;i<firstDow;i++) h+="<div class='calday blank'></div>";
+
+  for (let d=1; d<=days; d++){
+    const ds=iso(new Date(y,m,d));
+    const dow=new Date(y,m,d).getDay();
+    const sec=state.duty[ds]||"";
+    const cls="calday"+((dow===0||dow===6)?" weekend":"")+
+      (state.holidays[ds]?" hol":"")+(ds<today?" past":"")+
+      (ds===today?" today":"")+(ds===state.date?" active":"");
+    const assigned = sailorsOnDuty(ds).size;
+    const short = hasBill(ds) ? dayViolations(ds).length>0 : false;
+    const hol = state.holidays[ds];
+    const w = dutyWindow(ds);
+    h+="<div class='"+cls+(short?" short":"")+"'>"+
+       "<div class='caldate'><span class='dnum'>"+ordinal(d)+"</span>"+
+       "<span class='dayacts'>"+
+         "<button data-edit='"+ds+"' title='Edit this day&#39;s watchbill' aria-label='Edit "+ds+"'>"+iconEdit()+"</button>"+
+         "<button data-view='"+ds+"' title='View this day&#39;s watchbill' aria-label='View "+ds+"'>"+iconView()+"</button>"+
+       "</span></div>"+
+       ((hol||w.shift)?"<div class='daytags'>"+
+         (hol?"<span class='calhol' title='"+esc(typeof hol==="string"?hol:"Holiday")+"'>holiday</span>":"")+
+         (w.shift?"<span class='caldst' title='Clocks change'>"+(w.shift>0?"+":"")+(w.shift/60)+"h</span>":"")+
+       "</div>":"")+
+       (state.dutyModel==="minimal" ? ""
+         : "<select class='calsel"+(sec?" set":"")+"' data-day='"+ds+"' aria-label='Duty section for "+ds+
+           "'>"+sectionOptions(sec,true)+"</select>")+
+       "<span class='calassigned"+(short?" short":"")+"'>"+
+       (assigned? assigned+" assigned" : "")+"</span></div>";
+  }
+  const tail=(firstDow+days)%7;
+  if (tail) for (let i=tail;i<7;i++) h+="<div class='calday blank'></div>";
+
+  document.getElementById("calGrid").innerHTML=h;
+
+
+  const all=[], badDays=[];
+  for (let d=1; d<=days; d++){
+    const ds=iso(new Date(y,m,d));
+    if (!hasBill(ds)) continue;
+    const v=dayViolations(ds);
+    if (!v.length) continue;
+    badDays.push(d);
+    v.forEach(x=>all.push({ rule:x.rule, msg:d+" "+MONTHS[m].slice(0,3)+" — "+x.msg }));
+  }
+  document.getElementById("calBreach").innerHTML = all.length
+    ? breachHTML(all.slice(0,40),
+        badDays.length+" day"+(badDays.length===1?"":"s")+" this month ("+
+        badDays.join(", ")+") could not be manned within the rules."+
+        (all.length>40?" Showing the first 40 of "+all.length+".":""))
+    : "";
+}
+
+/* ================================================================== */
+/*  RENDER — MANAGEMENT                                               */
+/* ================================================================== */
+
+function renderDepts(){
+  document.getElementById("deptLine").innerHTML = state.departments.length
+    ? state.departments.map(d=>"<span class='pill'>"+esc(d)+
+        "<button data-dept='"+esc(d)+"' aria-label='Remove "+esc(d)+"'>&#10005;</button></span>").join("")
+    : "<span class='empty'>No departments yet.</span>";
+  document.getElementById("newSaDept").innerHTML=
+    state.departments.map(d=>"<option value='"+esc(d)+"'>"+esc(d)+"</option>").join("");
+}
+
+function renderStructures(){
+  document.getElementById("structList").innerHTML = state.structures.length
+    ? state.structures.map((st,i)=>
+        "<div class='structrow'><span class='nm'>"+esc(st.name)+"</span>"+
+        "<span class='meta'>"+st.stations.length+" stations · "+esc(st.workStart)+"–"+esc(st.workEnd)+
+        " / "+esc(st.wkndStart)+"–"+esc(st.wkndEnd)+"</span>"+
+        "<button class='btn' data-load='"+i+"'>Load</button>"+
+        "<button class='rowdel' data-delstruct='"+i+"' title='Delete'>&#10005;</button></div>").join("")
+    : "<p class='empty' style='padding:6px 0'>No saved layouts yet.</p>";
+}
+
+function renderStations(){
+  renderDepts(); renderStructures();
+  document.getElementById("newStLen").innerHTML=lengthOptions(4);
+
+  let h="<thead><tr><th class='m-sailor' style='min-width:0;width:210px'>Watchstation</th>"+
+    "<th class='m-col'><span class='qsum'>Default Length</span></th>"+
+    state.departments.map(d=>"<th class='q-head' style='"+qHeadStyle(state.departments)+
+      "'><span title='"+esc(d)+"'>"+esc(d)+"</span></th>").join("")+
+    "<th class='m-col m-acts'></th></tr></thead><tbody>";
+
+  if (!state.stations.length){
+    h+="<tr><td class='m-sailor' colspan='"+(state.departments.length+3)+"' style='padding:16px'>"+
+       "<span class='empty'>No watchstations yet. Add one below.</span></td></tr>";
+  }
+
+  state.stations.forEach((st,i)=>{
+    const deps=st.departments||[];
+    h+="<tr data-id='"+st.id+"'>"+
+      "<td class='m-sailor'><input class='st-name' data-f='name' maxlength='32' value='"+esc(st.name)+
+        "' aria-label='Watchstation title' /></td>"+
+      "<td class='m-col m-len'><select data-f='len' aria-label='Default watch length'>"+
+        lengthOptions(st.len)+"</select></td>"+
+      state.departments.map(d=>"<td class='m-col'><input type='checkbox' data-dep='"+esc(d)+"' "+
+        (deps.indexOf(d)!==-1?"checked":"")+" aria-label='"+esc(st.name)+" draws from "+esc(d)+"' /></td>").join("")+
+      "<td class='m-col m-acts'><button class='rowdel always' data-act='del' title='Remove "+esc(st.name)+
+        "' aria-label='Remove "+esc(st.name)+"'>&#10005;</button></td></tr>";
+  });
+  h+="</tbody>";
+  document.getElementById("stationTable").innerHTML=h;
+}
+
+function renderSectionsTab(){
+  syncSectionSelects();
+  document.getElementById("sectionLine").innerHTML = state.sections.length
+    ? state.sections.map(s=>{
+        const n=state.sailors.filter(x=>String(x.section)===String(s)).length;
+        return "<span class='pill'>Section "+esc(s)+" <span class='n'>"+n+"</span>"+
+          "<button data-sec='"+esc(s)+"' aria-label='Remove section "+esc(s)+"'>&#10005;</button></span>";
+      }).join("")
+    : "<span class='empty'>No duty sections yet.</span>";
+
+  const card=(title,extra,cls,people,removable)=>
+    "<div class='seccard "+cls+"'><header><h4>"+esc(title)+"</h4>"+
+    "<span class='n'>"+people.length+extra+"</span></header>"+
+    "<ul class='namelist'>"+(people.length
+      ? people.map(p=>"<li><span>"+esc(p.name)+"</span>"+
+          (removable?"<button data-unassign='"+p.id+"' title='Remove from section'>&#10005;</button>":"")+
+          "</li>").join("")
+      : "<li class='none'>Nobody assigned</li>")+"</ul></div>";
+
+  const need=dailyDemand(state.date);
+  let h="";
+  state.sections.forEach(sec=>{
+    const pool=sectionPool(sec).slice().sort((a,b)=>a.name.localeCompare(b.name));
+    const cov=standbyCoverage(pool);
+    const thin=pool.length<need;
+    h+=card("Section "+sec,
+            " · needs ~"+need+"/day"+(cov.unmet.length? " · standbys "+cov.unmet.length+" short":""),
+            (cov.unmet.length||thin)?"short":"ok", pool, true);
+  });
+  const loose=state.sailors.filter(s=>!s.section||state.sections.indexOf(String(s.section))===-1)
+                           .slice().sort((a,b)=>a.name.localeCompare(b.name));
+  if (loose.length) h+=card("Unassigned"," available any day","",loose,false);
+  document.getElementById("secRosters").innerHTML=h;
+  const thin=state.sections.filter(sec=>sectionPool(sec).length<need);
+  document.getElementById("secDemand").innerHTML = thin.length
+    ? "A full duty day needs about <b>"+need+"</b> sailors. Section "+
+      thin.map(esc).join(", ")+" cannot cover one alone, so the generator will borrow from other sections."
+    : "A full duty day needs about <b>"+need+"</b> sailors, and every section can cover one on its own.";
+}
+
+function renderStandbys(){
+  syncSectionSelects();
+
+  /* coverage panel, one card per section */
+  let h="";
+  if (!state.sections.length) h="<p class='empty'>No duty sections defined.</p>";
+  state.sections.forEach(sec=>{
+    const pool=sectionPool(sec);
+    const cov=standbyCoverage(pool);
+    const rows=state.standbys.map(sb=>{
+      const sid=cov.matchStation[sb.id];
+      const who=sid?sailorById(sid):null;
+      const n=(cov.qual[sb.id]||[]).length;
+      return "<li"+(who?"":" class='gap'")+"><span>"+esc(sb.name)+"</span><b>"+
+        (who?esc(who.name):"none available")+"</b></li>";
+    }).join("");
+    let why="";
+    if (cov.why){
+      const names=cov.why.stations.map(id=>{
+        const s=state.standbys.find(x=>x.id===id); return s?s.name:id;
+      });
+      why="<p class='covwhy'>"+names.length+" watch"+(names.length===1?"":"es")+" ("+
+        names.map(esc).join(", ")+") share only "+cov.why.sailors.length+" qualified sailor"+
+        (cov.why.sailors.length===1?"":"s")+".</p>";
+    }
+    h+="<div class='covcard "+(cov.unmet.length?"short":"ok")+"'>"+
+       "<h4>Section "+esc(sec)+"</h4>"+
+       "<p class='covstate "+(cov.unmet.length?"short":"ok")+"'>"+
+       (cov.unmet.length? cov.unmet.length+" of "+state.standbys.length+" cannot be manned"
+                        : "All "+state.standbys.length+" standby watches covered")+"</p>"+
+       "<ul class='covlist'>"+rows+"</ul>"+why+"</div>";
+  });
+  document.getElementById("covPanel").innerHTML=h;
+
+  /* standby watch list */
+  document.getElementById("standbyList").innerHTML=state.standbys.map((sb,i)=>
+    "<li class='rowline' data-id='"+sb.id+"'>"+
+      "<span class='c-num'>"+String(i+1).padStart(2,"0")+"</span>"+
+      "<input class='c-name' data-f='name' value='"+esc(sb.name)+"' aria-label='Standby watch title' />"+
+      "<span class='c-num' style='width:90px'>"+
+        state.sailors.filter(s=>(s.sbQuals||[]).indexOf(sb.id)!==-1).length+" qualified</span>"+
+      "<span class='c-acts'><button class='rowdel always' data-act='del' title='Remove "+esc(sb.name)+
+        "' aria-label='Remove "+esc(sb.name)+"'>&#10005;</button></span></li>").join("");
+
+  /* qualification matrix */
+  const f=state.sbFilter.toLowerCase();
+  const shown=state.sailors.filter(s=>{
+    if (f && s.name.toLowerCase().indexOf(f)===-1) return false;
+    if (state.sbSec && String(s.section)!==state.sbSec) return false;
+    if (state.sbOnlyQual && !(s.sbQuals||[]).length) return false;
+    return true;
+  });
+  let m="<thead><tr><th class='m-sailor'>"+esc(crewWord(true,false))+"</th>"+
+    state.standbys.map(s=>"<th class='q-head' style='"+qHeadStyle(state.standbys.map(x=>x.name))+
+      "'><span title='"+esc(s.name)+"'>"+esc(s.name)+"</span></th>").join("")+
+    "</tr></thead><tbody>";
+  if (!shown.length){
+    m+="<tr><td class='m-sailor' colspan='"+(state.standbys.length+1)+"' style='padding:16px'>"+
+       "<span class='empty'>No "+crewWord(false,true)+" match this filter.</span></td></tr>";
+  }
+  shown.forEach(sa=>{
+    const q=sa.sbQuals||[];
+    m+="<tr data-id='"+sa.id+"'>"+
+      "<td class='m-sailor'><span class='m-plain'>"+esc(sa.name)+"</span></td>"+
+      state.standbys.map(sb=>"<td class='m-col'><input type='checkbox' data-sq='"+sb.id+"' "+
+        (q.indexOf(sb.id)!==-1?"checked":"")+" aria-label='"+esc(sa.name)+" qualified for "+esc(sb.name)+"' /></td>").join("")+
+      "</tr>";
+  });
+  m+="</tbody>";
+  document.getElementById("sbMatrix").innerHTML=m;
+  document.getElementById("sbShown").textContent=shown.length+" of "+state.sailors.length+" shown";
+}
+
+function renderSailors(){
+  renderDepts(); syncSectionSelects();
+  const sts=state.stations;
+  const f=state.saFilter.toLowerCase();
+  let shown=state.sailors.filter(s=> !(f && s.name.toLowerCase().indexOf(f)===-1));
+  if (state.saSort==="az") shown=shown.slice().sort((a,b)=>a.name.localeCompare(b.name));
+  if (state.saSort==="za") shown=shown.slice().sort((a,b)=>b.name.localeCompare(a.name));
+
+  let h="<thead><tr><th class='m-sailor'>"+esc(crewWord(true,false))+"</th>"+
+    "<th class='m-col'><span class='qsum'>Department</span></th>"+
+    sts.map(s=>"<th class='q-head' style='"+qHeadStyle(sts.map(x=>x.name))+"'><span title='"+
+      esc(s.name)+"'>"+esc(s.name)+"</span></th>").join("")+
+    "<th class='m-col'></th></tr></thead><tbody>";
+
+  if (!shown.length){
+    h+="<tr><td class='m-sailor' colspan='"+(sts.length+3)+"' style='padding:16px'>"+
+       "<span class='empty'>"+(state.sailors.length?"No "+crewWord(false,true)+" match this filter."
+         :"No "+crewWord(false,true)+" on the roster. Add one above to start assigning watches.")+
+      "</span></td></tr>";
+  }
+
+  shown.forEach(sa=>{
+    const q=sa.quals||[];
+    const deptOpts=state.departments.map(d=>
+      "<option value='"+esc(d)+"'"+(sa.department===d?" selected":"")+">"+esc(d)+"</option>").join("");
+    h+="<tr data-id='"+sa.id+"'>"+
+      "<td class='m-sailor'><input class='m-name' data-f='name' value='"+esc(sa.name)+"' aria-label='Sailor name' /></td>"+
+      "<td class='m-col m-dept'><select data-f='department' aria-label='Department'>"+deptOpts+"</select></td>"+
+      sts.map(st=>{
+        const deps=st.departments||[];
+        const off=deps.length && deps.indexOf(sa.department)===-1;
+        return "<td class='m-col"+(off?" offdept":"")+"'><input type='checkbox' data-q='"+st.id+"' "+
+          (q.indexOf(st.id)!==-1?"checked":"")+" aria-label='"+esc(sa.name)+" qualified for "+esc(st.name)+"' /></td>";
+      }).join("")+
+      "<td class='m-col'><button class='rowdel' data-act='del' title='Remove "+esc(sa.name)+"' aria-label='Remove "+esc(sa.name)+"'>&#10005;</button></td></tr>";
+  });
+
+  h+="</tbody>";
+  document.getElementById("matrix").innerHTML=h;
+  document.getElementById("saShown").textContent=shown.length+" of "+state.sailors.length+" shown";
+
+  const gaps=state.stations.filter(st=>!state.sailors.some(sa=>(sa.quals||[]).indexOf(st.id)!==-1));
+  document.getElementById("rosterNote").innerHTML = gaps.length
+    ? "No "+crewWord(false,false)+" on the roster is qualified for: <b>"+
+      gaps.map(g=>esc(g.name)).join(", ")+"</b>."
+    : "";
+}
+
+/* ================================================================== */
+/*  TABS                                                              */
+/* ================================================================== */
+
+const SUBS={ daily:["bill","billprint"], cal:["calendar","calprint"],
+             management:["sailors","stations","sections","standbys"], settings:["settings","audits","help"] };
+const VIEWS=["bill","billprint","calendar","calprint","sailors","stations","sections","standbys",
+             "settings","audits","help"];
+
+function showTab(name){
+  state.tab=name;
+  /* Printoffs go on a bulkhead, so no theme decoration anywhere near them. */
+  document.documentElement.setAttribute("data-view",
+    (name==="billprint"||name==="calprint") ? "print" : "app");
+  VIEWS.forEach(v=>{ document.getElementById("view-"+v).hidden=(v!==name); });
+  document.querySelectorAll(".subtab").forEach(t=>t.setAttribute("aria-selected",String(t.dataset.tab===name)));
+  if (name==="bill") renderBill();
+  if (name==="calendar") renderCalendar();
+  if (name==="sailors") renderSailors();
+  if (name==="stations") renderStations();
+  if (name==="sections") renderSectionsTab();
+  if (name==="standbys") renderStandbys();
+  if (name==="billprint") renderBillPrint();
+  if (name==="calprint") renderCalPrint();
+  if (name==="settings") renderSettings();
+  if (name==="audits") renderAudits();
+}
+function showTop(top){
+  state.top=top;
+  document.querySelectorAll(".toptab").forEach(t=>t.setAttribute("aria-selected",String(t.dataset.top===top)));
+  Object.keys(SUBS).forEach(k=>{ document.getElementById("sub-"+k).hidden=(k!==top); });
+  if (SUBS[top].indexOf(state.tab)===-1) showTab(SUBS[top][0]);
+}
+document.querySelectorAll(".toptab").forEach(t=>t.addEventListener("click",()=>{ showTop(t.dataset.top); noteVisit(); }));
+document.querySelectorAll(".subtab").forEach(t=>t.addEventListener("click",()=>{ showTab(t.dataset.tab); noteVisit(); }));
+document.getElementById("navBack").addEventListener("click",()=>{
+  if (!navBack.length) return;
+  navFwd.push(navCurrent);
+  goTo(navBack.pop());
+});
+document.getElementById("navFwd").addEventListener("click",()=>{
+  if (!navFwd.length) return;
+  navBack.push(navCurrent);
+  goTo(navFwd.pop());
+});
+document.getElementById("navUndo").addEventListener("click",undo);
+
+/* ================================================================== */
+/*  EVENTS                                                            */
+/* ================================================================== */
+
+document.getElementById("date").addEventListener("change",e=>{
+  state.date=e.target.value; renderBill(); noteVisit();
+});
+
+["workStart","workEnd","wkndStart","wkndEnd"].forEach(id=>{
+  document.getElementById(id).addEventListener("change",e=>{
+    state[id]=e.target.value;
+    state.bills={};                       // watch boundaries moved under every bill
+    renderHeaderBits(); flash("Duty day changed — all bills cleared");
+  });
+});
+
+/* --- calendar --- */
+(function fillMonthYear(){
+  document.getElementById("calMonth").innerHTML=
+    MONTHS.map((m,i)=>"<option value='"+i+"'"+(i===state.calMonth?" selected":"")+">"+m+"</option>").join("");
+  const y0=now.getFullYear()-2;
+  let o="";
+  for (let y=y0; y<=y0+7; y++) o+="<option value='"+y+"'"+(y===state.calYear?" selected":"")+">"+y+"</option>";
+  document.getElementById("calYear").innerHTML=o;
+})();
+document.getElementById("calMonth").addEventListener("change",e=>{ state.calMonth=+e.target.value; renderCalendar(); });
+document.getElementById("calYear").addEventListener("change",e=>{ state.calYear=+e.target.value; renderCalendar(); });
+document.getElementById("btn-today").addEventListener("click",()=>{
+  const d=new Date();
+  state.calMonth=d.getMonth(); state.calYear=d.getFullYear();
+  document.getElementById("calMonth").value=state.calMonth;
+  document.getElementById("calYear").value=state.calYear;
+  renderCalendar();
+});
+document.getElementById("btn-clearMonth").addEventListener("click",()=>{
+  const days=new Date(state.calYear,state.calMonth+1,0).getDate();
+  for (let d=1; d<=days; d++) delete state.duty[iso(new Date(state.calYear,state.calMonth,d))];
+  renderCalendar(); flash("Month cleared");
+});
+document.getElementById("calGrid").addEventListener("change",e=>{
+  const sel=e.target.closest("select[data-day]"); if(!sel) return;
+  if (sel.value) state.duty[sel.dataset.day]=sel.value;
+  else delete state.duty[sel.dataset.day];
+  renderCalendar();
+});
+function openInEditor(ds){
+  state.date=ds;
+  document.getElementById("date").value=ds;
+  showTop("daily"); showTab("bill"); noteVisit();
+  flash("Watchbill set to "+ds);
+}
+document.getElementById("calGrid").addEventListener("click",e=>{
+  const ed=e.target.closest("button[data-edit]");
+  if (ed){ openInEditor(ed.dataset.edit); return; }
+  const vw=e.target.closest("button[data-view]");
+  if (vw){ openDayModal(vw.dataset.view); return; }
+});
+document.getElementById("modalClose").addEventListener("click",closeDayModal);
+document.getElementById("modalEdit").addEventListener("click",()=>{
+  const ds=modalDate; closeDayModal(); if (ds) openInEditor(ds);
+});
+document.getElementById("dayModal").addEventListener("click",e=>{
+  if (e.target.id==="dayModal") closeDayModal();
+});
+document.addEventListener("keydown",e=>{
+  if (e.key==="Escape" && !document.getElementById("dayModal").hidden) closeDayModal();
+});
+document.getElementById("dutyModel").addEventListener("change",e=>{
+  pushUndo("duty model");
+  applyDutyModel(e.target.value);
+  Object.keys(state.duty).forEach(k=>{           // the old rotation may name sections that are gone
+    if (state.sections.indexOf(state.duty[k])===-1) delete state.duty[k];
+  });
+  renderCalendar();
+  flash(state.dutyModel==="minimal"
+    ? "Maximizing days off — sections ignored, bills cleared"
+    : state.sections.length+" sections, crew redistributed — press Set duty rotation to lay out the month");
+});
+document.getElementById("btn-rotate").addEventListener("click",()=>{
+  if (state.dutyModel==="minimal"){ flash("This model does not use a fixed rotation"); return; }
+  pushUndo("duty rotation");
+  fillRotation();
+  renderCalendar();
+  flash("Rotation set for "+MONTHS[state.calMonth]+" "+state.calYear);
+});
+document.getElementById("btn-genmonth").addEventListener("click",async e=>{
+  const btn=e.currentTarget;
+  if (btn.disabled) return;
+  btn.disabled=true;
+  pushUndo("generate "+MONTHS[state.calMonth]+" "+state.calYear);
+  try{
+    const report=await generateMonth();
+    renderCalendar();
+    flash(report.length
+      ? "Generated · "+report.length+" day"+(report.length===1?"":"s")+" flagged"
+      : "Generated "+MONTHS[state.calMonth]+" "+state.calYear+" clean");
+  } finally { btn.disabled=false; }
+});
+
+/* --- reusable sailor typeahead --- */
+function makeTypeahead(inputId,listId,onPick){
+  const input=document.getElementById(inputId), list=document.getElementById(listId);
+  let hits=[], cursor=-1, picked=null;
+  function render(){
+    list.innerHTML = hits.length
+      ? hits.map((s,i)=>"<li role='option' data-i='"+i+"'"+(i===cursor?" class='on'":"")+">"+
+          esc(s.name)+"<small>"+esc(s.department)+" · Sec "+esc(s.section||"—")+"</small></li>").join("")
+      : "<li class='none'>No matching sailor</li>";
+    list.hidden=false; input.setAttribute("aria-expanded","true");
+  }
+  function close(){ list.hidden=true; input.setAttribute("aria-expanded","false"); cursor=-1; }
+  function choose(i){
+    const s=hits[i]; if(!s) return;
+    picked=s.id; input.value=s.name; close();
+    if (onPick) onPick(s);
+  }
+  input.addEventListener("input",()=>{
+    picked=null;
+    const t=input.value.trim().toLowerCase();
+    hits = t ? state.sailors.filter(s=>s.name.toLowerCase().indexOf(t)!==-1).slice(0,8) : [];
+    cursor = hits.length ? 0 : -1;
+    if (t) render(); else close();
+  });
+  input.addEventListener("keydown",e=>{
+    if (list.hidden) return;
+    if (e.key==="ArrowDown"){ e.preventDefault(); cursor=Math.min(cursor+1,hits.length-1); render(); }
+    else if (e.key==="ArrowUp"){ e.preventDefault(); cursor=Math.max(cursor-1,0); render(); }
+    else if (e.key==="Enter"){ if(cursor>=0){ e.preventDefault(); choose(cursor); } }
+    else if (e.key==="Escape"){ close(); }
+  });
+  input.addEventListener("blur",()=>setTimeout(close,150));
+  list.addEventListener("mousedown",e=>{
+    const li=e.target.closest("li[data-i]"); if(!li) return;
+    e.preventDefault(); choose(+li.dataset.i);
+  });
+  return {
+    /** the chosen sailor id, falling back to an exact typed name */
+    resolve(){
+      if (picked) return picked;
+      const t=input.value.trim().toLowerCase();
+      const hit=state.sailors.filter(s=>s.name.toLowerCase()===t);
+      return hit.length===1 ? hit[0].id : null;
+    },
+    clear(){ picked=null; input.value=""; close(); },
+    focus(){ input.focus(); }
+  };
+}
+const ndTA=makeTypeahead("ndName","ndList",()=>document.getElementById("ndStart").focus());
+const asTA=makeTypeahead("asName","asList",()=>document.getElementById("btn-assignSec").focus());
+
+document.getElementById("btn-addND").addEventListener("click",()=>{
+  const start=document.getElementById("ndStart").value;
+  const endEl=document.getElementById("ndEnd");
+  const reason=document.getElementById("ndReason").value.trim().slice(0,20);
+  const who=ndTA.resolve();
+  if (!who){ flash("Pick a sailor from the list first"); ndTA.focus(); return; }
+  if (!start){ flash("Set a start date"); return; }
+  const end=endEl.value||start;
+  if (end<start){ flash("End date is before the start date"); return; }
+  pushUndo("off-duty entry");
+  state.noDuty.push({ id:uid("nd"), sailorId:who, start:start, end:end, reason:reason });
+  const sa=sailorById(who);
+  logAudit("calendar","Off duty added",sa?sa.name:"(unknown)",
+    start+(end!==start?" → "+end:"")+(reason?" · "+reason:""));
+  ndTA.clear(); endEl.value=""; document.getElementById("ndReason").value="";
+  renderCalendar(); flash("Added to no duty");
+});
+document.getElementById("btn-addHol").addEventListener("click",()=>{
+  const a=document.getElementById("holStart").value;
+  const bEl=document.getElementById("holEnd");
+  const name=document.getElementById("holName").value.trim().slice(0,20)||"Holiday";
+  if (!a){ flash("Set a start date"); return; }
+  const b=bEl.value||a;
+  if (b<a){ flash("End date is before the start date"); return; }
+  pushUndo("holiday");
+  let cur=a, guard=0;
+  while (cur<=b && guard++<400){
+    state.holidays[cur]=name;
+    delete state.bills[cur];                  // its duty-day hours just changed
+    delete state.bills[shiftDate(cur,-1)];    // and so did the day before's end time
+    cur=shiftDate(cur,1);
+  }
+  bEl.value=""; document.getElementById("holName").value="";
+  renderCalendar(); flash("Added "+name);
+});
+document.getElementById("holListing").addEventListener("click",e=>{
+  const btn=e.target.closest("button[data-hol]"); if(!btn) return;
+  const ds=btn.dataset.hol;
+  pushUndo("holiday");
+  delete state.holidays[ds];
+  delete state.bills[ds];
+  delete state.bills[shiftDate(ds,-1)];
+  renderCalendar();
+});
+document.getElementById("ndListing").addEventListener("click",e=>{
+  const btn=e.target.closest("button[data-nd]"); if(!btn) return;
+  pushUndo("off-duty entry");
+  const gone=state.noDuty.find(n=>n.id===btn.dataset.nd);
+  if (gone){
+    const sa=sailorById(gone.sailorId);
+    logAudit("calendar","Off duty removed",sa?sa.name:"(removed sailor)",
+      gone.start+(gone.end!==gone.start?" → "+gone.end:"")+(gone.reason?" · "+gone.reason:""));
+  }
+  state.noDuty=state.noDuty.filter(n=>n.id!==btn.dataset.nd);
+  renderCalendar();
+});
+
+/* --- sections tab --- */
+document.getElementById("btn-addSection").addEventListener("click",addSection);
+document.getElementById("newSection").addEventListener("keydown",e=>{ if(e.key==="Enter") addSection(); });
+function addSection(){
+  const el=document.getElementById("newSection"), v=el.value.trim();
+  if (!v) return;
+  if (state.sections.indexOf(v)!==-1){ flash("That section already exists"); return; }
+  state.sections.push(v); el.value=""; renderSectionsTab();
+}
+document.getElementById("sectionLine").addEventListener("click",e=>{
+  const btn=e.target.closest("button[data-sec]"); if(!btn) return;
+  const s=btn.dataset.sec;
+  state.sections=state.sections.filter(x=>x!==s);
+  Object.keys(state.duty).forEach(k=>{ if (state.duty[k]===s) delete state.duty[k]; });
+  state.sailors.forEach(sa=>{ if (String(sa.section)===s) sa.section=""; });
+  renderSectionsTab();
+});
+
+document.getElementById("btn-assignSec").addEventListener("click",()=>{
+  const who=asTA.resolve();
+  if (!who){ flash("Pick a sailor from the list first"); asTA.focus(); return; }
+  const sec=document.getElementById("asSec").value;
+  if (!sec){ flash("Add a duty section first"); return; }
+  pushUndo("section assignment");
+  const sa=sailorById(who);
+  const was=sa.section;
+  sa.section=sec;
+  if (String(was)!==String(sec))
+    logAudit("sailor","Section changed",sa.name,(was?"Section "+was:"unassigned")+" → Section "+sec);
+  asTA.clear();
+  renderSectionsTab();
+  flash(sa.name+" assigned to Section "+sec);
+});
+document.getElementById("secRosters").addEventListener("click",e=>{
+  const btn=e.target.closest("button[data-unassign]"); if(!btn) return;
+  pushUndo("section assignment");
+  const sa=sailorById(btn.dataset.unassign);
+  if (sa){
+    if (sa.section) logAudit("sailor","Section changed",sa.name,"Section "+sa.section+" → unassigned");
+    sa.section="";
+  }
+  renderSectionsTab();
+});
+
+/* --- standbys --- */
+const sbList=document.getElementById("standbyList");
+sbList.addEventListener("input",e=>{
+  if (e.target.dataset.f!=="name") return;
+  const sb=state.standbys.find(s=>s.id===e.target.closest("li").dataset.id);
+  if (sb) sb.name=e.target.value;
+});
+sbList.addEventListener("click",e=>{
+  const btn=e.target.closest("button[data-act]"); if(!btn) return;
+  const id=btn.closest("li").dataset.id;
+  const i=state.standbys.findIndex(s=>s.id===id);
+  pushUndo("remove standby watch");
+  state.standbys.splice(i,1);
+  state.sailors.forEach(sa=>{ sa.sbQuals=(sa.sbQuals||[]).filter(q=>q!==id); });
+  Object.keys(state.bills).forEach(ds=>{
+    if (state.bills[ds].standby) delete state.bills[ds].standby[id];
+  });
+  renderStandbys();
+});
+document.getElementById("btn-addStandby").addEventListener("click",addStandby);
+document.getElementById("newSbName").addEventListener("keydown",e=>{ if(e.key==="Enter") addStandby(); });
+function addStandby(){
+  const n=document.getElementById("newSbName");
+  if (!n.value.trim()) return;
+  pushUndo("add standby watch");
+  state.standbys.push({ id:uid("sb"), name:n.value.trim() });
+  n.value=""; renderStandbys(); n.focus();
+}
+document.getElementById("sbMatrix").addEventListener("change",e=>{
+  const tr=e.target.closest("tr"); if(!tr||!tr.dataset.id) return;
+  const sa=state.sailors.find(s=>s.id===tr.dataset.id); if(!sa) return;
+  const q=e.target.dataset.sq; if(!q) return;
+  pushUndo("standby qualification");
+  sa.sbQuals=sa.sbQuals||[];
+  const i=sa.sbQuals.indexOf(q);
+  if (e.target.checked && i===-1){
+    sa.sbQuals.push(q);
+    logAudit("sailor","Qualified",sa.name,"Standby: "+stationName(q));
+  }
+  if (!e.target.checked && i!==-1){
+    sa.sbQuals.splice(i,1);
+    logAudit("sailor","Unqualified",sa.name,"Standby: "+stationName(q));
+  }
+  renderStandbys();
+});
+document.getElementById("sbFilter").addEventListener("input",e=>{ state.sbFilter=e.target.value; renderStandbys(); });
+document.getElementById("sbSecFilter").addEventListener("change",e=>{ state.sbSec=e.target.value; renderStandbys(); });
+document.getElementById("sbOnlyQual").addEventListener("change",e=>{ state.sbOnlyQual=e.target.checked; renderStandbys(); });
+
+/* --- departments --- */
+document.getElementById("btn-addDept").addEventListener("click",addDept);
+document.getElementById("newDept").addEventListener("keydown",e=>{ if(e.key==="Enter") addDept(); });
+function addDept(){
+  const el=document.getElementById("newDept"), v=el.value.trim();
+  if (!v) return;
+  if (state.departments.indexOf(v)!==-1){ flash("That department already exists"); return; }
+  state.departments.push(v); el.value=""; renderStations();
+}
+document.getElementById("deptLine").addEventListener("click",e=>{
+  const btn=e.target.closest("button[data-dept]"); if(!btn) return;
+  const d=btn.dataset.dept;
+  state.departments=state.departments.filter(x=>x!==d);
+  state.stations.forEach(st=>{ st.departments=(st.departments||[]).filter(x=>x!==d); });
+  state.sailors.forEach(sa=>{ if (sa.department===d) sa.department=state.departments[0]||""; });
+  renderStations();
+});
+
+/* --- watchstations --- */
+const stTable=document.getElementById("stationTable");
+stTable.addEventListener("input",e=>{
+  if (e.target.dataset.f!=="name") return;
+  const st=state.stations.find(s=>s.id===e.target.closest("tr").dataset.id);
+  if (st) st.name=e.target.value;
+});
+stTable.addEventListener("change",e=>{
+  const tr=e.target.closest("tr"); if(!tr||!tr.dataset.id) return;
+  const st=state.stations.find(s=>s.id===tr.dataset.id); if(!st) return;
+  if (e.target.dataset.f==="len"){
+    st.len = e.target.value==="all" ? "all" : +e.target.value;
+    delete L()[st.id];
+    Object.keys(A()).forEach(k=>{ if (k.indexOf(st.id+"::")===0) delete A()[k]; });
+    return;
+  }
+  const dep=e.target.dataset.dep;
+  if (dep){
+    st.departments=st.departments||[];
+    const i=st.departments.indexOf(dep);
+    if (e.target.checked && i===-1) st.departments.push(dep);
+    if (!e.target.checked && i!==-1) st.departments.splice(i,1);
+  }
+});
+stTable.addEventListener("click",e=>{
+  const btn=e.target.closest("button[data-act]"); if(!btn) return;
+  const id=btn.closest("tr").dataset.id;
+  const i=state.stations.findIndex(s=>s.id===id);
+  pushUndo("remove watchstation");
+  state.stations.splice(i,1);
+  Object.keys(state.bills).forEach(ds=>{
+    const bl=state.bills[ds];
+    Object.keys(bl.assign||{}).forEach(k=>{ if (k.indexOf(id+"::")===0) delete bl.assign[k]; });
+    if (bl.lengths) delete bl.lengths[id];
+  });
+  state.sailors.forEach(sa=>{ sa.quals=(sa.quals||[]).filter(q=>q!==id); });
+  renderStations();
+});
+document.getElementById("btn-saveStruct").addEventListener("click",()=>{
+  const el=document.getElementById("structName");
+  const name=el.value.trim();
+  if (!name){ flash("Give the layout a name"); el.focus(); return; }
+  const at=state.structures.findIndex(x=>x.name.toLowerCase()===name.toLowerCase());
+  if (at<0 && state.structures.length>=8){ flash("All 8 slots are full — delete one first"); return; }
+  const entry={ name:name, workStart:state.workStart, workEnd:state.workEnd,
+                wkndStart:state.wkndStart, wkndEnd:state.wkndEnd,
+                stations:clone(state.stations) };
+  if (at>=0) state.structures[at]=entry; else state.structures.push(entry);
+  el.value="";
+  renderStations();
+  flash(at>=0 ? "Replaced that layout" : "Saved layout "+state.structures.length+" of 8");
+});
+document.getElementById("structList").addEventListener("click",e=>{
+  const del=e.target.closest("button[data-delstruct]");
+  if (del){ state.structures.splice(+del.dataset.delstruct,1); renderStations(); return; }
+  const load=e.target.closest("button[data-load]");
+  if (!load) return;
+  const st=state.structures[+load.dataset.load];
+  if (!st) return;
+  pushUndo("load saved structure");
+  state.stations=clone(st.stations);
+  state.workStart=st.workStart; state.workEnd=st.workEnd;
+  state.wkndStart=st.wkndStart; state.wkndEnd=st.wkndEnd;
+  ["workStart","workEnd","wkndStart","wkndEnd"].forEach(id=>{
+    document.getElementById(id).value=state[id];
+  });
+  state.bills={};
+  renderStations(); renderHeaderBits();
+  flash("Loaded that layout — bills cleared");
+});
+document.getElementById("btn-addStation").addEventListener("click",addStation);
+document.getElementById("newStName").addEventListener("keydown",e=>{ if(e.key==="Enter") addStation(); });
+function addStation(){
+  const n=document.getElementById("newStName"), l=document.getElementById("newStLen");
+  if (!n.value.trim()) return;
+  pushUndo("add watchstation");
+  state.stations.push({ id:uid("st"), name:n.value.trim(),
+    len: l.value==="all" ? "all" : +l.value, departments:[] });
+  n.value=""; renderStations(); n.focus();
+}
+
+/* --- sailors --- */
+const matrix=document.getElementById("matrix");
+matrix.addEventListener("input",e=>{
+  if (e.target.dataset.f!=="name") return;
+  const sa=state.sailors.find(s=>s.id===e.target.closest("tr").dataset.id);
+  if (sa) sa.name=e.target.value;
+});
+matrix.addEventListener("focus",e=>{
+  if (e.target.dataset && e.target.dataset.f==="name") e.target.dataset.was=e.target.value;
+},true);
+matrix.addEventListener("blur",e=>{
+  if (!(e.target.dataset && e.target.dataset.f==="name")) return;
+  const tr=e.target.closest("tr"); if(!tr) return;
+  const sa=state.sailors.find(s=>s.id===tr.dataset.id); if(!sa) return;
+  const was=e.target.dataset.was;
+  if (was!==undefined && was!==sa.name) logAudit("sailor","Renamed",sa.name,"Was \""+was+"\"");
+  const clash=state.sailors.some(o=>o.id!==sa.id &&
+    o.name.trim().toLowerCase()===sa.name.trim().toLowerCase());
+  if (clash) flash("Two sailors are now called "+sa.name+" — give one a distinguishing initial");
+},true);
+matrix.addEventListener("change",e=>{
+  const tr=e.target.closest("tr"); if(!tr||!tr.dataset.id) return;
+  const sa=state.sailors.find(s=>s.id===tr.dataset.id); if(!sa) return;
+  const f=e.target.dataset.f;
+  if (f==="department"){
+    pushUndo("department");
+    const was=sa.department;
+    sa.department=e.target.value;
+    if (was!==sa.department)
+      logAudit("sailor","Department changed",sa.name,(was||"none")+" → "+sa.department);
+    renderSailors();
+    return;
+  }
+  const q=e.target.dataset.q;
+  if (q){
+    pushUndo("qualification");
+    sa.quals=sa.quals||[];
+    const i=sa.quals.indexOf(q);
+    if (e.target.checked && i===-1){
+      sa.quals.push(q);
+      logAudit("sailor","Qualified",sa.name,"Watch: "+stationName(q));
+    }
+    if (!e.target.checked && i!==-1){
+      sa.quals.splice(i,1);
+      logAudit("sailor","Unqualified",sa.name,"Watch: "+stationName(q));
+      Object.keys(A()).forEach(k=>{
+        if (k.indexOf(q+"::")===0 && A()[k]===sa.id) delete A()[k];
+      });
+    }
+  }
+});
+matrix.addEventListener("click",e=>{
+  const btn=e.target.closest("button[data-act='del']"); if(!btn) return;
+  const id=btn.closest("tr").dataset.id;
+  const gone=sailorById(id);
+  pushUndo("remove sailor");
+  if (gone) logAudit("sailor","Removed",gone.name,
+    "Department: "+gone.department+(gone.section?" · Section "+gone.section:""));
+  state.sailors=state.sailors.filter(s=>s.id!==id);
+  state.noDuty=state.noDuty.filter(n=>n.sailorId!==id);
+  Object.keys(A()).forEach(k=>{ if (A()[k]===id) delete A()[k]; });
+  renderSailors();
+});
+document.getElementById("saFilter").addEventListener("input",e=>{ state.saFilter=e.target.value; renderSailors(); });
+document.getElementById("saSort").addEventListener("change",e=>{ state.saSort=e.target.value; renderSailors(); });
+document.getElementById("btn-addSailor").addEventListener("click",addSailor);
+document.getElementById("newSaName").addEventListener("keydown",e=>{ if(e.key==="Enter") addSailor(); });
+function addSailor(){
+  const n=document.getElementById("newSaName"), d=document.getElementById("newSaDept");
+  const name=n.value.trim();
+  if (!name) return;
+  if (state.sailors.some(s=>s.name.trim().toLowerCase()===name.toLowerCase())){
+    flash("There is already a sailor called "+name+" — use a distinguishing initial");
+    n.focus(); n.select();
+    return;
+  }
+  const dept=d.value||state.departments[0]||"";
+  pushUndo("add sailor");
+  state.sailors.push({ id:uid("sa"), name:name, department:dept, section:"", quals:[], sbQuals:[] });
+  logAudit("sailor","Added",name,"Department: "+dept);
+  n.value=""; renderSailors(); n.focus();
+}
+
+/* --- bill actions --- */
+/* the rotating bill and the all-day strip share one handler */
+["billTable","alldayTable"].forEach(id=>document.getElementById(id).addEventListener("change",e=>{
+  const len=e.target.closest("select[data-len]");
+  if (len){
+    const id=len.dataset.len;
+    L()[id]= len.value==="all" ? "all" : +len.value;
+    Object.keys(A()).forEach(k=>{ if (k.indexOf(id+"::")===0) delete A()[k]; });
+    renderBill(); return;
+  }
+  const sel=e.target.closest("select[data-k]"); if(!sel) return;
+  pushUndo("watch assignment");
+  if (sel.value) A()[sel.dataset.k]=sel.value;
+  else delete A()[sel.dataset.k];
+  touch(state.date);
+  renderBill();
+}));
+document.getElementById("btn-resetLen").addEventListener("click",()=>{
+  dayBill().lengths={}; dayBill().assign={}; renderBill(); flash("Watch lengths reset to the defaults");
+});
+document.getElementById("btn-clear").addEventListener("click",()=>{
+  const b=dayBill(); b.assign={}; b.standby={}; renderBill();
+});
+document.getElementById("readout").addEventListener("change",e=>{
+  const sel=e.target.closest("select[data-sb]"); if(!sel) return;
+  pushUndo("standby assignment");
+  const b=dayBill();
+  if (sel.value) b.standby[sel.dataset.sb]=sel.value;
+  else delete b.standby[sel.dataset.sb];
+  touch(state.date);
+  renderBill();
+});
+document.getElementById("btn-fillsection").addEventListener("click",async e=>{
+  const btn=e.currentTarget;
+  if (btn.disabled) return;
+  btn.disabled=true;
+  try{
+    pushUndo("auto-fill "+state.date);
+    const sec=dutySection(state.date);
+    con.open("Filling "+state.date);
+    con.log("Duty "+(sec?"Section "+sec:"section not set")+" · "+
+            preferredPool(state.date).length+" sailors available");
+    const rows=buildRows();
+    let segs=0; rows.forEach(r=>segs+=r.segs.length);
+    con.log(segs+" watches across "+rows.length+" stations, plus "+state.standbys.length+" standbys");
+    await wait(260);
+    con.log("Matching qualifications…","hi");
+    await wait(240);
+    const built=buildDay(state.date,{},(t,c)=>con.log(t,c));
+    await wait(200);
+    if (built.count){
+      con.log("Settled with "+built.count+" flag"+(built.count===1?"":"s"),"bad");
+      con.log("Red cells show who and why.","bad");
+    } else {
+      con.log("All watches manned within the rules.","good");
+    }
+    renderBill();
+    flash(built.count ? built.count+" flag"+(built.count===1?"":"s")+" — see the note below"
+                      : "Filled from the duty section — all rules met");
+  } finally { btn.disabled=false; }
+});
+document.getElementById("btn-printBill").addEventListener("click",()=>window.print());
+document.getElementById("btn-printCal").addEventListener("click",()=>window.print());
+document.getElementById("calPrintAll").addEventListener("change",e=>{
+  state.calPrintAll=e.target.checked; renderCalPrint();
+});
+
+/* --- app settings --- */
+document.getElementById("setCommand").addEventListener("input",e=>{
+  state.command=e.target.value;
+  document.getElementById("command").textContent=state.command;
+  renderHeaderBits();
+});
+document.getElementById("sigList").addEventListener("input",e=>{
+  const i=e.target.dataset.sig;
+  if (i===undefined) return;
+  state.signatures[+i]=e.target.value;
+});
+document.getElementById("sigList").addEventListener("click",e=>{
+  const btn=e.target.closest("button[data-delsig]"); if(!btn) return;
+  state.signatures.splice(+btn.dataset.delsig,1);
+  renderSettings();
+});
+document.getElementById("themeRow").addEventListener("click",e=>{
+  const btn=e.target.closest("button[data-theme]"); if(!btn) return;
+  state.theme=btn.dataset.theme;
+  applyTheme();
+  renderSettings();
+  if (state.tab==="calendar") renderCalendar();
+  flash("Theme set to "+(THEMES.find(t=>t.id===state.theme)||{}).name);
+});
+document.getElementById("btn-addSig").addEventListener("click",()=>{
+  const el=document.getElementById("newSig"), v=el.value.trim();
+  if (!v) return;
+  if (state.signatures.length>=6){ flash("Six signature lines is the limit"); return; }
+  state.signatures.push(v); el.value=""; renderSettings();
+});
+document.getElementById("newSig").addEventListener("keydown",e=>{
+  if (e.key==="Enter") document.getElementById("btn-addSig").click();
+});
+document.getElementById("auditDays").addEventListener("change",e=>{
+  state.auditDays=+e.target.value;
+  pruneAudit(); renderAudits();
+  flash("Keeping audit entries for "+state.auditDays+" days");
+});
+document.getElementById("btn-csvSailor").addEventListener("click",()=>{
+  downloadCSV("sailor-audit-"+todayISO()+".csv",
+    [["Timestamp","Action",crewWord(true,false),"Detail"]].concat(
+      auditRows("sailor").map(a=>[fmtStamp(a.ts),a.action,a.who,a.detail])));
+});
+document.getElementById("btn-csvCal").addEventListener("click",()=>{
+  downloadCSV("calendar-audit-"+todayISO()+".csv",
+    [["Timestamp","Action",crewWord(true,false),"Detail"]].concat(
+      auditRows("calendar").map(a=>[fmtStamp(a.ts),a.action,a.who,a.detail])));
+});
+document.getElementById("expName").addEventListener("input",e=>{ state.exportName=e.target.value; });
+document.getElementById("autosave").addEventListener("change",e=>{
+  state.autosave=e.target.checked;
+  clearTimeout(saveTimer);
+  if (state.autosave) persist(true); else renderSaveState();
+  flash(state.autosave?"Autosave on":"Autosave off");
+});
+document.getElementById("btn-linkFile").addEventListener("click",async()=>{
+  if (!window.showSaveFilePicker){ flash("This browser cannot write files directly"); return; }
+  try{
+    fileHandle=await window.showSaveFilePicker({
+      suggestedName: exportBase()+".json",
+      types:[{description:"Watchbill data",accept:{"application/json":[".json"]}}]
+    });
+    await persist(true);
+    flash("Linked — every change now writes to that file");
+  }catch(err){ /* the picker was dismissed */ }
+});
+document.getElementById("btn-exportAll").addEventListener("click",()=>{
+  downloadJSON(exportBase()+".json",fullPayload());
+  flash("Exported "+exportBase()+".json");
+});
+document.getElementById("btn-exportDay").addEventListener("click",()=>{
+  const name=exportBase()+"-"+state.date+".json";
+  downloadJSON(name,dayPayload(state.date));
+  flash("Exported "+name);
+});
+document.getElementById("btn-importPick").addEventListener("click",()=>
+  document.getElementById("importFile").click());
+document.getElementById("importFile").addEventListener("change",e=>{
+  const file=e.target.files && e.target.files[0];
+  if (!file) return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      flash(applyImport(JSON.parse(reader.result)));
+    }catch(err){
+      flash("Could not read that file — "+(err.message||"unrecognised format"));
+    }
+    e.target.value="";
+  };
+  reader.onerror=()=>{ flash("Could not read that file"); e.target.value=""; };
+  reader.readAsText(file);
+});
+document.getElementById("btn-save2").addEventListener("click",async()=>{
+  await persist(true);
+  flash("Saved");
+});
+document.getElementById("btn-wipeBills").addEventListener("click",()=>{
+  pushUndo("clear all bills");
+  state.bills={}; renderCalendar(); flash("All generated bills cleared");
+});
+
+/* --- save / load --- */
+document.getElementById("btn-save").addEventListener("click",()=>{
+  try{
+    localStorage.setItem(STORE,JSON.stringify({
+      command:state.command,
+      workStart:state.workStart, workEnd:state.workEnd,
+      wkndStart:state.wkndStart, wkndEnd:state.wkndEnd, holidays:state.holidays,
+      departments:state.departments, sections:state.sections,
+      stations:state.stations, standbys:state.standbys, sailors:state.sailors,
+      duty:state.duty, noDuty:state.noDuty, bills:state.bills,
+      structures:state.structures, signatures:state.signatures,
+      audit:state.audit, auditDays:state.auditDays, theme:state.theme,
+      dutyModel:state.dutyModel, exportName:state.exportName, autosave:state.autosave }));
+    flash("Setup, calendar and standbys saved on this computer");
+  }catch(err){ flash("Can't save here — use Export CSV, or keep this file on a drive you control"); }
+});
+(function loadSetup(){
+  try{
+    const raw=localStorage.getItem(STORE); if(!raw) return;
+    const s=JSON.parse(raw);
+    if (s.departments && s.departments.length) state.departments=s.departments;
+    if (s.sections && s.sections.length) state.sections=s.sections;
+    if (s.stations && s.stations.length) state.stations=s.stations;
+    if (s.standbys && s.standbys.length) state.standbys=s.standbys;
+    if (s.sailors) state.sailors=s.sailors.map(x=>Object.assign({sbQuals:[]},x));
+    if (s.duty) state.duty=s.duty;
+    if (s.bills){ state.bills=s.bills; pruneBills(); }
+    if (s.structures) state.structures=s.structures;
+    if (s.signatures && s.signatures.length) state.signatures=s.signatures;
+    if (s.auditDays) state.auditDays=s.auditDays;
+    if (s.theme) state.theme=s.theme;
+    if (s.exportName) state.exportName=s.exportName;
+    if (s.autosave!==undefined) state.autosave=s.autosave;
+    if (s.dutyModel){
+      let m = s.dutyModel==="minimum" ? "minimal"
+            : s.dutyModel==="sections" ? String((s.sections||state.sections).length)
+            : s.dutyModel;
+      if (m!=="minimal" && m!=="3" && m!=="4") m="4";   // five-section retired
+      state.dutyModel=m;
+    }
+    if (s.audit){
+      state.audit=s.audit;
+      state.audit.forEach(a=>{ if (a.seq>auditSeq) auditSeq=a.seq; });
+      pruneAudit();
+    }
+    if (s.noDuty) state.noDuty=s.noDuty;
+    if (s.command) state.command=s.command;
+    if (s.holidays) state.holidays=s.holidays;
+    state.workStart = s.workStart || s.dayStart || state.workStart;   // migrate older saves
+    state.workEnd   = s.workEnd   || s.dayEnd   || state.workEnd;
+    state.wkndStart = s.wkndStart || state.wkndStart;
+    state.wkndEnd   = s.wkndEnd   || state.wkndEnd;
+  }catch(err){ /* nothing saved, or storage blocked */ }
+})();
+
+/* --- exposed for scripted checks --- */
+window.wb={ state:state, solveDay:solveDay, generateMonth:generateMonth, dayViolations:dayViolations,
+            buildRowsFor:buildRowsFor, sailorsOnDuty:sailorsOnDuty, iso:iso, dutyWindow:dutyWindow,
+            dayPool:dayPool, preferredPool:preferredPool, onDuty:onDuty, stamp:stamp, stampEnd:stampEnd,
+            flaggedCells:flaggedCells, renderCalendar:renderCalendar, hasBill:hasBill };
+
+/* Mutations all come from the UI, so listening on the way back up catches them all. */
+["change","input","click"].forEach(evt=>
+  document.addEventListener(evt,()=>markDirty(),false));
+window.addEventListener("beforeunload",()=>{ if (state.autosave) saveLocal(); });
+
+/* --- boot --- */
+applyTheme();
+pruneBills();
+if (state.dutyModel!=="minimal" && !Object.keys(state.duty).length) fillRotation();
+pruneAssignments();
+document.getElementById("command").textContent=state.command;
+document.getElementById("date").value=state.date;
+["workStart","workEnd","wkndStart","wkndEnd"].forEach(id=>{
+  document.getElementById(id).value=state[id];
+});
+syncSectionSelects();
+showTop("daily");
+showTab("bill");
+navCurrent=here();
+refreshNav();
+</script>
+</body>
+</html>
